@@ -51,6 +51,7 @@
     <None Include="res\BlogCrawlerApplication.rc2">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\BlogCrawlerApplication.ico">
