@@ -3,8 +3,8 @@
 //
 
 #include "stdafx.h"
-#include "BlogCrawlerApplication.h"
-#include "BlogCrawlerApplicationDlg.h"
+#include "CrawlerApplication.h"
+#include "CrawlerApplicationDlg.h"
 #include "afxdialogex.h"
 
 #include <thread>
@@ -159,6 +159,11 @@ HCURSOR CBlogCrawlerApplicationDlg::OnQueryDragIcon()
 void CBlogCrawlerApplicationDlg::OnBnClickedCrawlingButton()
 {
 	std::thread([&] {
+		/*auto app = reinterpret_cast<BlogAfxGetApp();
+		if (app != nullptr)
+		{
+			
+		}*/
 
 	}).detach();
 }

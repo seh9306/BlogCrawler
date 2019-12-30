@@ -28,9 +28,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BlogCrawlerApplication.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -39,9 +36,6 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="BlogCrawlerApplicationDlg.h">
-      <Filter>src\view</Filter>
     </ClInclude>
     <ClInclude Include="HttpClient.h">
       <Filter>src\util</Filter>
@@ -64,16 +58,16 @@
     <ClInclude Include="BlogCrawlService.h">
       <Filter>src\service</Filter>
     </ClInclude>
+    <ClInclude Include="CrawlerApplication.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="CrawlerApplicationDlg.h">
+      <Filter>src\view</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlogCrawlerApplication.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="BlogCrawlerApplicationDlg.cpp">
-      <Filter>src\view</Filter>
     </ClCompile>
     <ClCompile Include="HttpClient.cpp">
       <Filter>src\util</Filter>
@@ -89,6 +83,12 @@
     </ClCompile>
     <ClCompile Include="CrawlService.cpp">
       <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="CrawlerApplication.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="CrawlerApplicationDlg.cpp">
+      <Filter>src\view</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,8 +3,8 @@
 //
 
 #include "stdafx.h"
-#include "BlogCrawlerApplication.h"
-#include "BlogCrawlerApplicationDlg.h"
+#include "CrawlerApplication.h"
+#include "CrawlerApplicationDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
