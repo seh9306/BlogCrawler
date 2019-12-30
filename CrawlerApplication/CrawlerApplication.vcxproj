@@ -213,7 +213,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="BlogCrawlerApplication.rc" />
+    <ResourceCompile Include="CrawlerApplication.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
