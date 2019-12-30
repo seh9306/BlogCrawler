@@ -15,10 +15,10 @@
 // 이 클래스의 구현에 대해서는 BlogCrawlerApplication.cpp을(를) 참조하세요.
 //
 
-class CBlogCrawlerApplicationApp : public CWinApp
+class CCrawlerApplicationApp : public CWinApp
 {
 public:
-	CBlogCrawlerApplicationApp();
+	CCrawlerApplicationApp();
 
 // 재정의입니다.
 public:
@@ -29,4 +29,4 @@ public:
 	DECLARE_MESSAGE_MAP()
 };
 
-extern CBlogCrawlerApplicationApp theApp;
+extern CCrawlerApplicationApp theApp;
