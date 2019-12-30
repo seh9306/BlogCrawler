@@ -6,6 +6,9 @@
 namespace crawler
 {
 
+namespace blog
+{
+
 HerbsutterBlogCrawler::HerbsutterBlogCrawler()
 {
 }
@@ -26,7 +29,7 @@ bool HerbsutterBlogCrawler::RequestForGettingArchives()
 
 	int statusCode = httpClient.GetResponseCode();
 
-	if (statusCode != httpClient.kResponseOK)
+	if (statusCode != util::HttpClient::kResponseOK)
 	{
 		return false;
 	}
@@ -45,6 +48,8 @@ bool HerbsutterBlogCrawler::RequestForGettingArticles()
 bool HerbsutterBlogCrawler::InsertArticles()
 {
 	return false;
+}
+
 }
 
 }

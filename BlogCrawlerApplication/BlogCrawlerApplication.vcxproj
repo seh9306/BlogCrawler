@@ -187,6 +187,9 @@
     <ClInclude Include="BlogCrawler.h" />
     <ClInclude Include="BlogCrawlerApplication.h" />
     <ClInclude Include="BlogCrawlerApplicationDlg.h" />
+    <ClInclude Include="BlogCrawlService.h" />
+    <ClInclude Include="CrawlService.h" />
+    <ClInclude Include="Crawler.h" />
     <ClInclude Include="HerbsutterBlogCrawler.h" />
     <ClInclude Include="HttpClient.h" />
     <ClInclude Include="Resource.h" />
@@ -197,6 +200,8 @@
     <ClCompile Include="BlogCrawler.cpp" />
     <ClCompile Include="BlogCrawlerApplication.cpp" />
     <ClCompile Include="BlogCrawlerApplicationDlg.cpp" />
+    <ClCompile Include="BlogCrawlService.cpp" />
+    <ClCompile Include="CrawlService.cpp" />
     <ClCompile Include="HerbsutterBlogCrawler.cpp" />
     <ClCompile Include="HttpClient.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -210,7 +215,9 @@
     <ResourceCompile Include="BlogCrawlerApplication.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="res\BlogCrawlerApplication.rc2" />
   </ItemGroup>
   <ItemGroup>

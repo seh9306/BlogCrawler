@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
 
 // CBlogCrawlerApplicationDlg 대화 상자
 class CBlogCrawlerApplicationDlg : public CDialogEx
@@ -17,12 +19,9 @@ public:
 	enum { IDD = IDD_BLOGCRAWLERAPPLICATION_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
-
-// 구현입니다.
-protected:
 	HICON m_hIcon;
 
 	// 생성된 메시지 맵 함수
@@ -30,5 +29,11 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnBnClickedCrawlingButton();
+
 	DECLARE_MESSAGE_MAP()
+
+private:
+	CButton crawlingButton;
+
 };

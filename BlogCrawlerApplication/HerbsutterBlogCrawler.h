@@ -6,10 +6,12 @@
 namespace {
 	constexpr char* const kHost = "herbsutter.com";
 	constexpr char* const kArchivePath = "/";
-	
 }
 
 namespace crawler
+{
+
+namespace blog
 {
 
 class HerbsutterBlogCrawler :
@@ -24,6 +26,8 @@ private:
 	bool RequestForGettingArticles() override;
 	bool InsertArticles() override;
 };
+
+}
 
 }
 

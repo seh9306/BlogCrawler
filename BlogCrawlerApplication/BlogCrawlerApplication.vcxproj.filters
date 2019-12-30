@@ -20,6 +20,12 @@
     <Filter Include="src\model">
       <UniqueIdentifier>{d4d823b6-ff5c-4d6d-bbe9-02b74cc57344}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\service">
+      <UniqueIdentifier>{bdfeb08e-750d-4b1e-b345-6916ecd35961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\crawler\blog">
+      <UniqueIdentifier>{1f9dba72-e5a7-4c52-a5a6-8d2548bfac49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BlogCrawlerApplication.h">
@@ -40,14 +46,23 @@
     <ClInclude Include="HttpClient.h">
       <Filter>src\util</Filter>
     </ClInclude>
-    <ClInclude Include="BlogCrawler.h">
-      <Filter>src\crawler</Filter>
-    </ClInclude>
     <ClInclude Include="Article.h">
       <Filter>src\model</Filter>
     </ClInclude>
-    <ClInclude Include="HerbsutterBlogCrawler.h">
+    <ClInclude Include="Crawler.h">
       <Filter>src\crawler</Filter>
+    </ClInclude>
+    <ClInclude Include="BlogCrawler.h">
+      <Filter>src\crawler\blog</Filter>
+    </ClInclude>
+    <ClInclude Include="HerbsutterBlogCrawler.h">
+      <Filter>src\crawler\blog</Filter>
+    </ClInclude>
+    <ClInclude Include="CrawlService.h">
+      <Filter>src\service</Filter>
+    </ClInclude>
+    <ClInclude Include="BlogCrawlService.h">
+      <Filter>src\service</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -64,10 +79,16 @@
       <Filter>src\util</Filter>
     </ClCompile>
     <ClCompile Include="BlogCrawler.cpp">
-      <Filter>src\crawler</Filter>
+      <Filter>src\crawler\blog</Filter>
     </ClCompile>
     <ClCompile Include="HerbsutterBlogCrawler.cpp">
-      <Filter>src\crawler</Filter>
+      <Filter>src\crawler\blog</Filter>
+    </ClCompile>
+    <ClCompile Include="BlogCrawlService.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="CrawlService.cpp">
+      <Filter>src\service</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -6,19 +6,24 @@
 #include <vector>
 
 #include "Article.h"
+#include "Crawler.h"
 
 using boost::asio::ip::tcp;
 
 namespace crawler
 {
 
+namespace blog
+{
+
 class BlogCrawler
+	: public Crawler
 {
 public:
 	BlogCrawler();
 	virtual ~BlogCrawler();
 
-	bool Crawl();
+	bool Crawl() override;
 
 protected:
 	std::vector<model::Article> articles;
@@ -32,6 +37,8 @@ private:
 	virtual bool RequestForGettingArticles() = 0;
 	virtual bool InsertArticles() = 0;
 };
+
+}
 
 }
 

@@ -7,6 +7,8 @@
 #include "BlogCrawlerApplicationDlg.h"
 #include "afxdialogex.h"
 
+#include <thread>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -58,12 +60,14 @@ CBlogCrawlerApplicationDlg::CBlogCrawlerApplicationDlg(CWnd* pParent /*=nullptr*
 void CBlogCrawlerApplicationDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_BUTTON1, crawlingButton);
 }
 
 BEGIN_MESSAGE_MAP(CBlogCrawlerApplicationDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CBlogCrawlerApplicationDlg::OnBnClickedCrawlingButton)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +156,9 @@ HCURSOR CBlogCrawlerApplicationDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CBlogCrawlerApplicationDlg::OnBnClickedCrawlingButton()
+{
+	std::thread([&] {
+
+	}).detach();
+}

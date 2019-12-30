@@ -4,6 +4,9 @@
 namespace crawler
 {
 
+namespace blog
+{
+
 BlogCrawler::BlogCrawler()
 	: ctx_(boost::asio::ssl::context::sslv23),
 	resolver_(ioContext_)
@@ -33,6 +36,8 @@ bool BlogCrawler::Crawl()
 	}
 
 	return true;
+}
+
 }
 
 }
