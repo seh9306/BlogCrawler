@@ -20,12 +20,13 @@ HerbsutterBlogCrawler::~HerbsutterBlogCrawler()
 
 bool HerbsutterBlogCrawler::RequestForGettingArchives()
 {
-	tcp::resolver resolver(ioContext_);
+	boost::asio::io_context ioContext;
+	tcp::resolver resolver(ioContext);
 	tcp::resolver::query query(kHost, "https");
 	auto endpoints = resolver.resolve(query);
 
-	util::HttpClient httpClient(ioContext_, ctx_, endpoints, kHost, kArchivePath);
-	ioContext_.run();
+	util::HttpClient httpClient(ioContext, ctx_, endpoints, kHost, kArchivePath);
+	ioContext.run();
 
 	int statusCode = httpClient.GetResponseCode();
 

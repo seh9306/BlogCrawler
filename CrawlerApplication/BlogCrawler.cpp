@@ -8,8 +8,7 @@ namespace blog
 {
 
 BlogCrawler::BlogCrawler()
-	: ctx_(boost::asio::ssl::context::sslv23),
-	resolver_(ioContext_)
+	: ctx_(boost::asio::ssl::context::sslv23)
 {
 	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
 }

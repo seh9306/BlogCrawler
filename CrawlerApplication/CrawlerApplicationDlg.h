@@ -31,9 +31,8 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnBnClickedCrawlingButton();
 
-	DECLARE_MESSAGE_MAP()
-
 private:
 	CButton crawlingButton;
 
+	DECLARE_MESSAGE_MAP()
 };

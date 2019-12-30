@@ -28,9 +28,7 @@ public:
 protected:
 	std::vector<model::Article> articles;
 
-	boost::asio::io_context ioContext_;
 	boost::asio::ssl::context ctx_;
-	tcp::resolver resolver_;
 
 private:
 	virtual bool RequestForGettingArchives() = 0;

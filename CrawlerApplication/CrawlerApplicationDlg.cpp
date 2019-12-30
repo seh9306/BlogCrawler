@@ -159,11 +159,12 @@ HCURSOR CCrawlerApplicationDlg::OnQueryDragIcon()
 void CCrawlerApplicationDlg::OnBnClickedCrawlingButton()
 {
 	std::thread([&] {
-		/*auto app = reinterpret_cast<BlogAfxGetApp();
+		auto app = reinterpret_cast<CCrawlerApplicationApp*>(AfxGetApp());
+
 		if (app != nullptr)
 		{
-			
-		}*/
+			app->RunCrawlService();
+		}
 
 	}).detach();
 }
