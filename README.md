@@ -4,7 +4,16 @@
 
 HTTP Module : Boost 1.71.0 (asio)
 
-XML Parser Module : pugixml
+HTML5 parser Module : gumbo
+XML parser Module로 pugixml, tinyxml2, libxml2, rapidxml 등을 이용해보았음.
+하지만 xml parser는 HTML5 태그를 지원하지 않음. (syntax error)
+
+- example
+```html
+<meta charset="UTF-8">
+<br>
+```
+위와 같이 닫는 태그가 없는 경우 xml 문법 오류가 발생함.
 
 ## 크롤링 대상 사이트 분석
 
@@ -28,7 +37,7 @@ XML Parser Module : pugixml
 </html>
 ```
 
-xPath of archives : **//*[@id="archives-4"]**
+selector archives : **"#archives-4 > ul > li"**
 
 - Article according to date ( path = "/[year]/[month]")
 
@@ -59,10 +68,6 @@ xPath of archives : **//*[@id="archives-4"]**
 </html>
 ```
 
-xPath of articles : **//*[@id="main"]/article**
-
-xPath of article[i]'s url : **//*[@id="main"]/article[i]/header/h1/a**
-
 - Article ( path = "/[year]/[month]/[title]")
 
 ```html
@@ -81,6 +86,7 @@ xPath of article[i]'s url : **//*[@id="main"]/article[i]/header/h1/a**
 </html>
 ```
 
-xPath of article : **//*[@id="main"]/article**
-
 ---
+2. devblogs.microsoft.com/oldnewthing/
+
+reponse body(html)에 \n00006000\n 형식으로 비정상 적인 값이 들어있는 케이스가 존재.
