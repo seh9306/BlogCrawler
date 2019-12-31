@@ -1,14 +1,10 @@
-#ifndef CRAWLER_BLOGCRAWLER_H
-#define CRAWLER_BLOGCRAWLER_H
+#ifndef CRAWLER_BLOG_CRAWLER_H
+#define CRAWLER_BLOG_CRAWLER_H
 
-#include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <vector>
 
-#include "Article.h"
 #include "Crawler.h"
-
-using boost::asio::ip::tcp;
 
 namespace crawler
 {
@@ -26,14 +22,22 @@ public:
 	bool Crawl() override;
 
 protected:
-	std::vector<model::Article> articles;
-
 	boost::asio::ssl::context ctx_;
 
 private:
-	virtual bool RequestForGettingArchives() = 0;
+	std::vector<std::string> GetArticlesUrl();
+
 	virtual bool RequestForGettingArticles() = 0;
 	virtual bool InsertArticles() = 0;
+
+	virtual const char* const GetHost() = 0;
+	virtual const char* const GetArchivePath() = 0;
+	virtual const char* const GetSelectorForArchivesTag() = 0;
+	virtual const char* const GetSelectorForUrlTag() = 0;
+	virtual const char* const GetAttributeNameForUrl() = 0;
+
+	virtual void CatchExceptionalUrlCase(std::string& url);
+
 };
 
 }

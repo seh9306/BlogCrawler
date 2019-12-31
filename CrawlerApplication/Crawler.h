@@ -1,6 +1,10 @@
 #ifndef CRAWLER_CRAWLER_H
 #define CRAWLER_CRAWLER_H
 
+namespace {
+	constexpr char* const kHttpsProtocolName = "https";
+}
+
 namespace crawler
 {
 

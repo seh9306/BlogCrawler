@@ -1,5 +1,5 @@
-#ifndef SERVICE_CRAWL_H
-#define SERVICE_CRAWL_H
+#ifndef SERVICE_CRAWL_SERVICE_H
+#define SERVICE_CRAWL_SERVICE_H
 
 #include <memory>
 #include <vector>

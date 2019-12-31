@@ -1,12 +1,7 @@
-#ifndef CRAWLER_HERBSUTTER_BLOG_CRAWLER_H
-#define CRAWLER_HERBSUTTER_BLOG_CRAWLER_H
+#ifndef CRAWLER_BLOG_HERBSUTTER_BLOG_CRAWLER_H
+#define CRAWLER_BLOG_HERBSUTTER_BLOG_CRAWLER_H
 
 #include "BlogCrawler.h"
-
-namespace {
-	constexpr char* const kHost = "herbsutter.com";
-	constexpr char* const kArchivePath = "/";
-}
 
 namespace crawler
 {
@@ -22,9 +17,14 @@ public:
 	virtual ~HerbsutterBlogCrawler();
 
 private:
-	bool RequestForGettingArchives() override;
 	bool RequestForGettingArticles() override;
 	bool InsertArticles() override;
+
+	const char* const GetHost() override;
+	const char* const GetArchivePath() override;
+	const char* const GetSelectorForArchivesTag() override;
+	const char* const GetSelectorForUrlTag() override;
+	const char* const GetAttributeNameForUrl() override;
 };
 
 }

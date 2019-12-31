@@ -8,14 +8,10 @@ namespace model
 
 struct Article
 {
-	Article(std::string title,
-		std::string url,
-		std::string content,
-		std::string imagePath = "")
-		: title(title),
-		url(url),
-		content(content),
-		imagePath(imagePath)
+	Article() {}
+
+	Article(std::string url)
+		: url(url)
 	{
 	}
 

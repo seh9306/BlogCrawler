@@ -1,7 +1,20 @@
 #include "stdafx.h"
 #include "HerbsutterBlogCrawler.h"
 
-#include "HttpClient.h"
+namespace {
+	constexpr char* const kHost = "herbsutter.com";
+	constexpr char* const kArchivePath = "/";
+
+	// css selector
+	constexpr char* const kSelectorForArchivesTag = "#archives-4 > ul > li";
+	constexpr char* const kSelectorForUrlTag = "a";
+
+	// tag name
+	constexpr char* const kArticleTagName = "article";
+
+	// tag attribute
+	constexpr char* const kUrlAttribute = "href";
+}
 
 namespace crawler
 {
@@ -13,32 +26,8 @@ HerbsutterBlogCrawler::HerbsutterBlogCrawler()
 {
 }
 
-
 HerbsutterBlogCrawler::~HerbsutterBlogCrawler()
 {
-}
-
-bool HerbsutterBlogCrawler::RequestForGettingArchives()
-{
-	boost::asio::io_context ioContext;
-	tcp::resolver resolver(ioContext);
-	tcp::resolver::query query(kHost, "https");
-	auto endpoints = resolver.resolve(query);
-
-	util::HttpClient httpClient(ioContext, ctx_, endpoints, kHost, kArchivePath);
-	ioContext.run();
-
-	int statusCode = httpClient.GetStatusCode();
-
-	if (statusCode != util::HttpClient::kResponseOK)
-	{
-		return false;
-	}
-
-	auto buf = httpClient.GetResponseBuf();
-	auto size = httpClient.GetResponseSize();
-
-	return true;
 }
 
 bool HerbsutterBlogCrawler::RequestForGettingArticles()
@@ -49,6 +38,31 @@ bool HerbsutterBlogCrawler::RequestForGettingArticles()
 bool HerbsutterBlogCrawler::InsertArticles()
 {
 	return false;
+}
+
+const char* const HerbsutterBlogCrawler::GetHost()
+{
+	return kHost;
+}
+
+const char* const HerbsutterBlogCrawler::GetArchivePath()
+{
+	return kArchivePath;
+}
+
+const char* const HerbsutterBlogCrawler::GetSelectorForArchivesTag()
+{
+	return kSelectorForArchivesTag;
+}
+
+const char* const HerbsutterBlogCrawler::GetSelectorForUrlTag()
+{
+	return kSelectorForUrlTag;
+}
+
+const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl()
+{
+	return kUrlAttribute;
 }
 
 }

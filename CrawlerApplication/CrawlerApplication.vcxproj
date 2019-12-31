@@ -94,6 +94,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)gumbo-query\src;$(SolutionDir)gumbo-parser\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,6 +117,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)gumbo-query\src;$(SolutionDir)gumbo-parser\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +142,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)gumbo-query\src;$(SolutionDir)gumbo-parser\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -166,6 +169,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)gumbo-query\src;$(SolutionDir)gumbo-parser\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -191,6 +195,7 @@
     <ClInclude Include="CrawlerApplicationDlg.h" />
     <ClInclude Include="CrawlService.h" />
     <ClInclude Include="Crawler.h" />
+    <ClInclude Include="DevMicrosoftBlogCrawler.h" />
     <ClInclude Include="HerbsutterBlogCrawler.h" />
     <ClInclude Include="HttpClient.h" />
     <ClInclude Include="Resource.h" />
@@ -203,6 +208,7 @@
     <ClCompile Include="CrawlerApplication.cpp" />
     <ClCompile Include="CrawlerApplicationDlg.cpp" />
     <ClCompile Include="CrawlService.cpp" />
+    <ClCompile Include="DevMicrosoftBlogCrawler.cpp" />
     <ClCompile Include="HerbsutterBlogCrawler.cpp" />
     <ClCompile Include="HttpClient.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -227,6 +233,9 @@
   <ItemGroup>
     <ProjectReference Include="..\gumbo-parser\visualc\gumbo.vcxproj">
       <Project>{2661fa5e-acc3-4d27-8fd2-9dbb0414eedc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\gumbo-query\project\gumbo_query_static.vcxproj">
+      <Project>{c90bcc60-8bca-3dad-b2dc-6e7978152a3a}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
