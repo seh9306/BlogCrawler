@@ -5,7 +5,9 @@
 HTTP Module : Boost 1.71.0 (asio)
 
 HTML5 parser Module : gumbo
+
 XML parser Module로 pugixml, tinyxml2, libxml2, rapidxml 등을 이용해보았음.
+
 하지만 xml parser는 HTML5 태그를 지원하지 않음. (syntax error)
 
 - example
