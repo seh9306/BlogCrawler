@@ -91,7 +91,7 @@ BOOL CCrawlerApplicationApp::InitInstance()
 	return FALSE;
 }
 
-void CCrawlerApplicationApp::RunCrawlService()
+void CCrawlerApplicationApp::RunCrawlService() const
 {
 	for (auto& crawlService : crawlSerivces)
 	{

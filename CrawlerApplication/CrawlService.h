@@ -16,7 +16,7 @@ public:
 	virtual ~CrawlService();
 
 	virtual void CreateCrawlers() = 0;
-	void Execute();
+	void Execute() const;
 
 protected:
 	std::vector<std::unique_ptr<crawler::Crawler>> crawlers;

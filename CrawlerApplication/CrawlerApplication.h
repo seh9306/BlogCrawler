@@ -24,7 +24,7 @@ public:
 	CCrawlerApplicationApp();
 
 	virtual BOOL InitInstance();
-	void RunCrawlService();
+	void RunCrawlService() const;
 
 private:
 	void InitServices();

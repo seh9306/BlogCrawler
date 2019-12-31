@@ -30,11 +30,11 @@ private:
 	virtual bool RequestForGettingArticles() = 0;
 	virtual bool InsertArticles() = 0;
 
-	virtual const char* const GetHost() = 0;
-	virtual const char* const GetArchivePath() = 0;
-	virtual const char* const GetSelectorForArchivesTag() = 0;
-	virtual const char* const GetSelectorForUrlTag() = 0;
-	virtual const char* const GetAttributeNameForUrl() = 0;
+	virtual const char* const GetHost() const = 0;
+	virtual const char* const GetArchivePath() const = 0;
+	virtual const char* const GetSelectorForArchivesTag() const = 0;
+	virtual const char* const GetSelectorForUrlTag() const = 0;
+	virtual const char* const GetAttributeNameForUrl() const = 0;
 
 	virtual void CatchExceptionalUrlCase(std::string& url);
 

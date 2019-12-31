@@ -40,27 +40,27 @@ bool DevMicrosoftBlogCrawler::InsertArticles()
 	return false;
 }
 
-const char* const DevMicrosoftBlogCrawler::GetHost()
+const char* const DevMicrosoftBlogCrawler::GetHost() const
 {
 	return kHost;
 }
 
-const char* const DevMicrosoftBlogCrawler::GetArchivePath()
+const char* const DevMicrosoftBlogCrawler::GetArchivePath() const
 {
 	return kArchivePath;
 }
 
-const char* const DevMicrosoftBlogCrawler::GetSelectorForArchivesTag()
+const char* const DevMicrosoftBlogCrawler::GetSelectorForArchivesTag() const
 {
 	return kSelectorForArchivesTag;
 }
 
-const char* const DevMicrosoftBlogCrawler::GetSelectorForUrlTag()
+const char* const DevMicrosoftBlogCrawler::GetSelectorForUrlTag() const
 {
 	return kSelectorForUrlTag;
 }
 
-const char* const DevMicrosoftBlogCrawler::GetAttributeNameForUrl()
+const char* const DevMicrosoftBlogCrawler::GetAttributeNameForUrl() const
 {
 	return kUrlAttribute;
 }

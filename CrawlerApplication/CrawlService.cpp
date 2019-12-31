@@ -12,7 +12,7 @@ CrawlService::~CrawlService()
 {
 }
 
-void CrawlService::Execute()
+void CrawlService::Execute() const
 {
 	for (auto& crawler : crawlers)
 	{

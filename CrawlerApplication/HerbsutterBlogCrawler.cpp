@@ -40,27 +40,27 @@ bool HerbsutterBlogCrawler::InsertArticles()
 	return false;
 }
 
-const char* const HerbsutterBlogCrawler::GetHost()
+const char* const HerbsutterBlogCrawler::GetHost() const
 {
 	return kHost;
 }
 
-const char* const HerbsutterBlogCrawler::GetArchivePath()
+const char* const HerbsutterBlogCrawler::GetArchivePath() const
 {
 	return kArchivePath;
 }
 
-const char* const HerbsutterBlogCrawler::GetSelectorForArchivesTag()
+const char* const HerbsutterBlogCrawler::GetSelectorForArchivesTag() const
 {
 	return kSelectorForArchivesTag;
 }
 
-const char* const HerbsutterBlogCrawler::GetSelectorForUrlTag()
+const char* const HerbsutterBlogCrawler::GetSelectorForUrlTag() const
 {
 	return kSelectorForUrlTag;
 }
 
-const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl()
+const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 {
 	return kUrlAttribute;
 }
