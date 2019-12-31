@@ -92,7 +92,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="BlogCrawlerApplication.rc">
+    <ResourceCompile Include="CrawlerApplication.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
