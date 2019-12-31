@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "HerbsutterBlogCrawler.h"
 
+#include "Document.h"
+#include "Node.h"
 #include "HttpClient.h"
 
 namespace crawler
@@ -28,7 +30,7 @@ bool HerbsutterBlogCrawler::RequestForGettingArchives()
 	util::HttpClient httpClient(ioContext, ctx_, endpoints, kHost, kArchivePath);
 	ioContext.run();
 
-	int statusCode = httpClient.GetResponseCode();
+	int statusCode = httpClient.GetStatusCode();
 
 	if (statusCode != util::HttpClient::kResponseOK)
 	{

@@ -37,7 +37,7 @@ size_t HttpClient::GetResponseSize() const
 	return response_.size();
 }
 
-int HttpClient::GetResponseCode() const
+int HttpClient::GetStatusCode() const
 {
 	return statusCode_;
 }

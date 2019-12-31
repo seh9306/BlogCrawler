@@ -36,7 +36,7 @@ public:
 
 	const char* GetResponseBuf() const;
 	size_t GetResponseSize() const;
-	int GetResponseCode() const;
+	int GetStatusCode() const;
 
 private:
 	void Connect(const tcp::resolver::results_type& endpoints);
