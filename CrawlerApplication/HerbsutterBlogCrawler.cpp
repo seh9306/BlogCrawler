@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "HerbsutterBlogCrawler.h"
 
-#include "Document.h"
-#include "Node.h"
 #include "HttpClient.h"
 
 namespace crawler
