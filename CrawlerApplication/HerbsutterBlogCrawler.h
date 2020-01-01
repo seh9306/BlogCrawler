@@ -17,6 +17,9 @@ public:
 	virtual ~HerbsutterBlogCrawler();
 
 private:
+
+
+	// template method
 	const char* const GetHost() const override;
 	const char* const GetArchivePath() const override;
 	const char* const GetSelectorForArchivesTag() const override;

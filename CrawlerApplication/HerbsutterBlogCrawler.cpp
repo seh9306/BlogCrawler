@@ -62,6 +62,17 @@ const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 
 bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
 {
+	for (auto& htmlDoc : htmlDocs)
+	{
+		auto articleSelections = htmlDoc->find(kArticleTagName);
+		auto articleNum = articleSelections.nodeNum();
+
+		for (auto i = 0; i < articleNum; ++i)
+		{
+			auto article = articleSelections.nodeAt(i);
+		}
+	}
+
 	return true;
 }
 
