@@ -60,7 +60,7 @@ const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 	return kUrlAttribute;
 }
 
-bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& urls)
+bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
 {
 	return true;
 }

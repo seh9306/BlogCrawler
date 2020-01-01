@@ -23,7 +23,7 @@ private:
 	const char* const GetSelectorForUrlTag() const override;
 	const char* const GetAttributeNameForUrl() const override;
 
-	bool GetAndInsertArticles(HtmlDocList& urls) override;
+	bool GetAndInsertArticles(HtmlDocList& htmlDocs) override;
 	void CatchExceptionalUrlCase(std::string& url) override;
 };
 

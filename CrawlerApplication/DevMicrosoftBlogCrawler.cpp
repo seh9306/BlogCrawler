@@ -62,7 +62,7 @@ const char* const DevMicrosoftBlogCrawler::GetAttributeNameForUrl() const
 	return kUrlAttribute;
 }
 
-bool DevMicrosoftBlogCrawler::GetAndInsertArticles(HtmlDocList& urls)
+bool DevMicrosoftBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
 {
 	return true;
 }
