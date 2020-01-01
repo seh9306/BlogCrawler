@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "DevMicrosoftBlogCrawler.h"
 
+#include <Document.h>
+#include <Node.h>
+
+#include "HttpClient.h"
+
 namespace {
 	constexpr char* const kHost = "devblogs.microsoft.com";
 	constexpr char* const kArchivePath = "/oldnewthing/";
@@ -14,6 +19,8 @@ namespace {
 
 	// tag attribute
 	constexpr char* const kUrlAttribute = "href";
+
+	//constexpr bool kShouldCrawlerEachArticleRequest = true;
 }
 
 namespace crawler
@@ -28,16 +35,6 @@ DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler()
 
 DevMicrosoftBlogCrawler::~DevMicrosoftBlogCrawler()
 {
-}
-
-bool DevMicrosoftBlogCrawler::RequestForGettingArticles()
-{
-	return false;
-}
-
-bool DevMicrosoftBlogCrawler::InsertArticles()
-{
-	return false;
 }
 
 const char* const DevMicrosoftBlogCrawler::GetHost() const
@@ -63,6 +60,11 @@ const char* const DevMicrosoftBlogCrawler::GetSelectorForUrlTag() const
 const char* const DevMicrosoftBlogCrawler::GetAttributeNameForUrl() const
 {
 	return kUrlAttribute;
+}
+
+bool DevMicrosoftBlogCrawler::GetAndInsertArticles(HtmlDocList& urls)
+{
+	return true;
 }
 
 void DevMicrosoftBlogCrawler::CatchExceptionalUrlCase(std::string& url)

@@ -17,14 +17,14 @@ public:
 	virtual ~HerbsutterBlogCrawler();
 
 private:
-	bool RequestForGettingArticles() override;
-	bool InsertArticles() override;
-
 	const char* const GetHost() const override;
 	const char* const GetArchivePath() const override;
 	const char* const GetSelectorForArchivesTag() const override;
 	const char* const GetSelectorForUrlTag() const override;
 	const char* const GetAttributeNameForUrl() const override;
+
+	bool GetAndInsertArticles(HtmlDocList& urls) override;
+	void CatchExceptionalUrlCase(std::string& url) override;
 };
 
 }

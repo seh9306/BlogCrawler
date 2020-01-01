@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "HerbsutterBlogCrawler.h"
 
+#include <Document.h>
+#include <Node.h>
+
 namespace {
 	constexpr char* const kHost = "herbsutter.com";
 	constexpr char* const kArchivePath = "/";
@@ -14,6 +17,8 @@ namespace {
 
 	// tag attribute
 	constexpr char* const kUrlAttribute = "href";
+
+	//constexpr bool kShouldCrawlerRequestEachArticle = false;
 }
 
 namespace crawler
@@ -28,16 +33,6 @@ HerbsutterBlogCrawler::HerbsutterBlogCrawler()
 
 HerbsutterBlogCrawler::~HerbsutterBlogCrawler()
 {
-}
-
-bool HerbsutterBlogCrawler::RequestForGettingArticles()
-{
-	return false;
-}
-
-bool HerbsutterBlogCrawler::InsertArticles()
-{
-	return false;
 }
 
 const char* const HerbsutterBlogCrawler::GetHost() const
@@ -63,6 +58,16 @@ const char* const HerbsutterBlogCrawler::GetSelectorForUrlTag() const
 const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 {
 	return kUrlAttribute;
+}
+
+bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& urls)
+{
+	return true;
+}
+
+void HerbsutterBlogCrawler::CatchExceptionalUrlCase(std::string & url)
+{
+	/* Do nothing in this class */
 }
 
 }

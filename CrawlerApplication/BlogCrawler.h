@@ -4,6 +4,8 @@
 #include <boost/asio/ssl.hpp>
 #include <vector>
 
+#include <Document.h>
+
 #include "Crawler.h"
 
 namespace crawler
@@ -11,6 +13,9 @@ namespace crawler
 
 namespace blog
 {
+
+typedef std::vector<std::string> UrlList;
+typedef std::vector<std::unique_ptr<Document>> HtmlDocList;
 
 class BlogCrawler
 	: public Crawler
@@ -25,19 +30,18 @@ protected:
 	boost::asio::ssl::context ctx_;
 
 private:
-	std::vector<std::string> GetArticlesUrl();
+	UrlList GetArchiveUrls();
+	HtmlDocList ReqeustAndGetArchiveDocs(UrlList& urls);
 
-	virtual bool RequestForGettingArticles() = 0;
-	virtual bool InsertArticles() = 0;
-
+	// template method
 	virtual const char* const GetHost() const = 0;
 	virtual const char* const GetArchivePath() const = 0;
 	virtual const char* const GetSelectorForArchivesTag() const = 0;
 	virtual const char* const GetSelectorForUrlTag() const = 0;
 	virtual const char* const GetAttributeNameForUrl() const = 0;
 
-	virtual void CatchExceptionalUrlCase(std::string& url);
-
+	virtual bool GetAndInsertArticles(HtmlDocList& htmlDocs) = 0;
+	virtual void CatchExceptionalUrlCase(std::string& url) = 0;
 };
 
 }
