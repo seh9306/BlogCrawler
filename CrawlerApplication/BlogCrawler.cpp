@@ -12,8 +12,9 @@ namespace crawler
 namespace blog
 {
 
-BlogCrawler::BlogCrawler()
-	: ctx_(boost::asio::ssl::context::sslv23)
+BlogCrawler::BlogCrawler(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao)
+	: blogArticleDao_(blogArticleDao),
+	ctx_(boost::asio::ssl::context::sslv23)
 {
 	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
 }

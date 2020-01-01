@@ -5,18 +5,18 @@
 #include <Node.h>
 
 namespace {
-	constexpr char* const kHost = "herbsutter.com";
-	constexpr char* const kArchivePath = "/";
+	constexpr char* const kHost = u8"herbsutter.com";
+	constexpr char* const kArchivePath = u8"/";
 
 	// css selector
-	constexpr char* const kSelectorForArchivesTag = "#archives-4 > ul > li";
-	constexpr char* const kSelectorForUrlTag = "a";
+	constexpr char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
+	constexpr char* const kSelectorForUrlTag = u8"a";
 
 	// tag name
-	constexpr char* const kArticleTagName = "article";
+	constexpr char* const kArticleTagName = u8"article";
 
 	// tag attribute
-	constexpr char* const kUrlAttribute = "href";
+	constexpr char* const kUrlAttribute = u8"href";
 
 	//constexpr bool kShouldCrawlerRequestEachArticle = false;
 }
@@ -27,7 +27,10 @@ namespace crawler
 namespace blog
 {
 
-HerbsutterBlogCrawler::HerbsutterBlogCrawler()
+
+HerbsutterBlogCrawler::HerbsutterBlogCrawler(
+	std::shared_ptr<dao::BlogArticleDao> blogArticleDao)
+	: BlogCrawler(blogArticleDao)
 {
 }
 

@@ -7,18 +7,18 @@
 #include "HttpClient.h"
 
 namespace {
-	constexpr char* const kHost = "devblogs.microsoft.com";
-	constexpr char* const kArchivePath = "/oldnewthing/";
+	constexpr char* const kHost = u8"devblogs.microsoft.com";
+	constexpr char* const kArchivePath = u8"/oldnewthing/";
 
 	// css selector
-	constexpr char* const kSelectorForArchivesTag = "div.listdisplay li"; // "#wrapper-footer > div:nth-child(1) > div > div:nth-child(1) > div > div > div > li";
-	constexpr char* const kSelectorForUrlTag = "a";
+	constexpr char* const kSelectorForArchivesTag = u8"div.listdisplay li"; // "#wrapper-footer > div:nth-child(1) > div > div:nth-child(1) > div > div > div > li";
+	constexpr char* const kSelectorForUrlTag = u8"a";
 
 	// tag name
-	constexpr char* const kArticleTagName = "article";
+	constexpr char* const kArticleTagName = u8"article";
 
 	// tag attribute
-	constexpr char* const kUrlAttribute = "href";
+	constexpr char* const kUrlAttribute = u8"href";
 
 	//constexpr bool kShouldCrawlerEachArticleRequest = true;
 }
@@ -29,7 +29,9 @@ namespace crawler
 namespace blog
 {
 
-DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler()
+DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler(
+	std::shared_ptr<dao::BlogArticleDao> blogArticleDao)
+	: BlogCrawler(blogArticleDao)
 {
 }
 

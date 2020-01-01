@@ -17,8 +17,12 @@ BlogCrawlService::~BlogCrawlService()
 
 void BlogCrawlService::CreateCrawlers()
 {
-	crawlers.push_back(std::make_unique<crawler::blog::HerbsutterBlogCrawler>());
-	crawlers.push_back(std::make_unique<crawler::blog::DevMicrosoftBlogCrawler>());
+	auto blogArticleDao = std::make_shared<dao::BlogArticleDao>();
+
+	blogArticleDao->Initialize();
+
+	crawlers.push_back(std::make_unique<crawler::blog::HerbsutterBlogCrawler>(blogArticleDao));
+	crawlers.push_back(std::make_unique<crawler::blog::DevMicrosoftBlogCrawler>(blogArticleDao));
 }
 
 }
