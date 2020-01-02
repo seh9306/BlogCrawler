@@ -234,8 +234,8 @@
     <ProjectReference Include="..\gumbo-parser\visualc\gumbo.vcxproj">
       <Project>{2661fa5e-acc3-4d27-8fd2-9dbb0414eedc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\gumbo-query\project\gumbo_query_static.vcxproj">
-      <Project>{c90bcc60-8bca-3dad-b2dc-6e7978152a3a}</Project>
+    <ProjectReference Include="..\gumbo-query\src\gumbo_query_static.vcxproj">
+      <Project>{c51a7fa7-7610-4158-8f98-4a48fe1d0411}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
