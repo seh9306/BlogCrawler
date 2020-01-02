@@ -11,14 +11,25 @@ struct Article
 	Article() {}
 
 	Article(std::string url)
-		: url(url)
+		: url_(url)
 	{
 	}
 
-	std::string title;
-	std::string url;
-	std::string imagePath;
-	std::string content;
+	Article(std::string title,
+			std::string url,
+			std::string imagePath,
+			std::string content)
+		: title_(title),
+		url_(url),
+		imagePath_(imagePath),
+		content_(content)
+	{
+	}
+
+	std::string title_;
+	std::string url_;
+	std::string imagePath_;
+	std::string content_;
 };
 
 }

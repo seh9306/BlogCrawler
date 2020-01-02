@@ -2,10 +2,11 @@
 #define CRAWLER_BLOG_CRAWLER_H
 
 #include <boost/asio/ssl.hpp>
+#include <Document.h>
+#include <memory>
 #include <vector>
 
-#include <Document.h>
-
+#include "BlogArticleDao.h"
 #include "Crawler.h"
 
 namespace crawler
@@ -21,13 +22,14 @@ class BlogCrawler
 	: public Crawler
 {
 public:
-	BlogCrawler();
+	BlogCrawler(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao);
 	virtual ~BlogCrawler();
 
 	bool Crawl() override;
 
 protected:
 	boost::asio::ssl::context ctx_;
+	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 
 private:
 	UrlList GetArchiveUrls();

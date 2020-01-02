@@ -65,7 +65,7 @@ BOOL CCrawlerApplicationApp::InitInstance()
 	SetRegistryKey(_T("Crawler"));
 
 	InitServices();
-
+	
 	CCrawlerApplicationDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
