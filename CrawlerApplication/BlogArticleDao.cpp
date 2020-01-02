@@ -14,6 +14,8 @@ namespace
 
 	constexpr char* const articleTableName = "ARTICLE";
 
+	constexpr int kZeroEndString = -1;
+
 	constexpr int kBadAction = -1;
 	constexpr int kSqliteOK = SQLITE_OK;
 
@@ -77,7 +79,10 @@ BlogArticleDao::~BlogArticleDao()
 
 bool BlogArticleDao::Initialize()
 {
-	actions_[kSelectAllAritcle] = std::bind(&BlogArticleDao::SelectAllAritcle, this, _1, _2, _3, _4);
+	actions_[kSelectAllAritcle] 
+		= [this](int argc, char** argv, char** azColName, model::ArticleList* ptrArticles) -> int { 
+			return SelectAllAritcle(argc, argv, azColName, ptrArticles);
+		};
 
 	if (DBopen() != kSqliteOK)
 	{
@@ -105,14 +110,31 @@ bool BlogArticleDao::Uninitialize()
 	return true;
 }
 
-bool BlogArticleDao::InsertArticles(ArticleList& articles)
+bool BlogArticleDao::InsertArticles(model::ArticleList& articles)
 {
-	return Sqlite3Exec(INSERT_ARTICLES_QUERY) == kSqliteOK;
+	sqlite3_stmt* pStmt = NULL;
+
+	std::string query(BEGIN_TRANSACTION);
+
+	for(model::Article& article : articles) {
+		sqlite3_prepare_v2(db_, INSERT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
+		sqlite3_bind_text(pStmt, kTitle, article.title_.c_str(), article.title_.size(), SQLITE_STATIC);
+		sqlite3_bind_text(pStmt, kUrl, article.url_.c_str(), article.url_.size(), SQLITE_STATIC);
+		sqlite3_bind_text(pStmt, kImagePath, article.imagePath_.c_str(), article.imagePath_.size(), SQLITE_STATIC);
+		sqlite3_bind_text(pStmt, kContent, article.content_.c_str(), article.content_.size(), SQLITE_STATIC);
+
+		query.append(sqlite3_expanded_sql(pStmt));
+
+		sqlite3_finalize(pStmt);
+	};
+	query.append(COMMIT);
+
+	return Sqlite3Exec(query.c_str()) == kSqliteOK;
 }
 
-ArticleList BlogArticleDao::SelectArticles()
+model::ArticleList BlogArticleDao::SelectArticles()
 {
-	ArticleList articles;
+	model::ArticleList articles;
 
 	Sqlite3Exec(SELECT_ALL_ARTICLES_QUERY, kSelectAllAritcle, articles);
 
@@ -124,7 +146,7 @@ bool BlogArticleDao::DBopen()
 	return sqlite3_open(kDbFilePath, &db_);
 }
 
-int BlogArticleDao::SelectAllAritcle(int argc, char** argv, char** azColName, ArticleList* ptrArticles)
+int BlogArticleDao::SelectAllAritcle(int argc, char** argv, char** azColName, model::ArticleList* ptrArticles)
 {
 	if (argc == 0)
 	{
@@ -153,7 +175,7 @@ int BlogArticleDao::Sqlite3Exec(const char* const query, sqlite3_callback callba
 	return rc;
 }
 
-int BlogArticleDao::Sqlite3Exec(const char* const query, int actionIndex, ArticleList& articles)
+int BlogArticleDao::Sqlite3Exec(const char* const query, int actionIndex, model::ArticleList& articles)
 {
 	ArticleActionData actionData(articles, actions_, actionIndex);
 

@@ -6,6 +6,10 @@
 namespace model
 {
 
+struct Article;
+
+using ArticleList = std::vector<model::Article>;
+
 struct Article
 {
 	Article() {}
@@ -31,6 +35,8 @@ struct Article
 	std::string imagePath_;
 	std::string content_;
 };
+
+
 
 }
 

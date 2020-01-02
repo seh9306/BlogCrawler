@@ -11,10 +11,8 @@
 
 namespace dao
 {
-
-typedef std::vector<model::Article> ArticleList;
-typedef std::unordered_map<int, std::function<int(int, char**, char**, ArticleList*)>> ActionMap;
-
+using ActionFuncType = int(int, char**, char**, model::ArticleList*);
+using ActionMap = std::unordered_map<int, std::function<ActionFuncType>>;
 
 struct ActionData
 {
@@ -29,12 +27,12 @@ struct ActionData
 
 struct ArticleActionData 
 {
-	ArticleActionData(ArticleList& articles, ActionMap& actions, int actionIndex)
+	ArticleActionData(model::ArticleList& articles, ActionMap& actions, int actionIndex)
 		: articles_(articles),
 		actionData_(actions, actionIndex)
 	{}
 
-	ArticleList& articles_;
+	model::ArticleList& articles_;
 	ActionData actionData_;
 };
 
@@ -46,17 +44,17 @@ public:
 	bool Initialize();
 	bool Uninitialize();
 
-	bool InsertArticles(ArticleList& articles);
-	ArticleList SelectArticles();
+	bool InsertArticles(model::ArticleList& articles);
+	model::ArticleList SelectArticles();
 
 	bool DBopen();
 
 private:
-	int SelectAllAritcle(int argc, char **argv, char **azColName, ArticleList* ptrArticles);
+	int SelectAllAritcle(int argc, char **argv, char **azColName, model::ArticleList* ptrArticles);
 
 	int Sqlite3Exec(const char* const query);
 	int Sqlite3Exec(const char* const query, sqlite3_callback callback, void* data);
-	int Sqlite3Exec(const char* const query, int actionIndex, ArticleList& articles);
+	int Sqlite3Exec(const char* const query, int actionIndex, model::ArticleList& articles);
 
 	sqlite3* db_;
 	ActionMap actions_;
