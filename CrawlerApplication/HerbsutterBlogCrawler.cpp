@@ -11,14 +11,17 @@ namespace {
 	// css selector
 	constexpr char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
 	constexpr char* const kSelectorForUrlTag = u8"a";
+	constexpr char* const kSelectorTitleAndUrlTag = u8"header > h1 > a";
+	constexpr char* const kSelectorContentTag = u8"div.entry-content";
+	constexpr char* const kSelectorImgTag = u8"img";
 
 	// tag name
 	constexpr char* const kArticleTagName = u8"article";
 
 	// tag attribute
 	constexpr char* const kUrlAttribute = u8"href";
+	constexpr char* const kSrcAttribute = u8"src";
 
-	//constexpr bool kShouldCrawlerRequestEachArticle = false;
 }
 
 namespace crawler
@@ -65,6 +68,8 @@ const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 
 bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
 {
+	model::ArticleList articles;
+
 	for (auto& htmlDoc : htmlDocs)
 	{
 		auto articleSelections = htmlDoc->find(kArticleTagName);
@@ -72,8 +77,35 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
 
 		for (auto i = 0; i < articleNum; ++i)
 		{
-			auto article = articleSelections.nodeAt(i);
+			auto articleSelection = articleSelections.nodeAt(i);
+			auto titleAndUrlTagSelection = articleSelection.find(kSelectorTitleAndUrlTag);
+			auto titleAndUrlTag = titleAndUrlTagSelection.nodeAt(0);
+
+			model::Article article;
+
+			article.title_ = titleAndUrlTag.text();
+			article.url_ = titleAndUrlTag.attribute(kUrlAttribute);
+
+			auto contentTagSelection = articleSelection.find(kSelectorContentTag);
+			auto contentTag = contentTagSelection.nodeAt(0);
+
+			article.content_ = contentTag.text();
+
+			auto imgTagSelection = contentTag.find(kSelectorImgTag);
+
+			if (imgTagSelection.nodeNum() != 0)
+			{
+				auto url = imgTagSelection.nodeAt(0).attribute(kSrcAttribute);
+				article.imagePath_ = DownloadImage(url);
+			}
+
+			articles.emplace_back(article);
 		}
+	}
+
+	if (!blogArticleDao_->InsertArticles(articles))
+	{
+		return false;
 	}
 
 	return true;

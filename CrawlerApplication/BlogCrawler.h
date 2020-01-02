@@ -28,6 +28,8 @@ public:
 	bool Crawl() override;
 
 protected:
+	std::string DownloadImage(std::string& url);
+
 	boost::asio::ssl::context ctx_;
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 

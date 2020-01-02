@@ -47,6 +47,11 @@ bool BlogCrawler::Crawl()
 	return true;
 }
 
+std::string BlogCrawler::DownloadImage(std::string & url)
+{
+	return std::string();
+}
+
 UrlList BlogCrawler::GetArchiveUrls()
 {
 	boost::asio::io_context ioContext;

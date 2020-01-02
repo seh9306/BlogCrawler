@@ -29,7 +29,7 @@ CREATE TABLE ARTICLE(
 constexpr char* const INSERT_ARTICLES_QUERY = R"d(
 INSERT INTO ARTICLE (TITLE,URL,IMAGEPATH,CONTENT)
 VALUES 
-   ("1","2","3","4");
+   (?,?,?,?);
 )d";
 
 constexpr char* const SELECT_ALL_ARTICLES_QUERY = R"d(
