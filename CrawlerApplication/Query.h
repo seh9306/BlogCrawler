@@ -1,6 +1,9 @@
 #ifndef QUERY_QUERY_H
 #define QUERY_QUERY_H
 
+constexpr char* const BEGIN_TRANSACTION = "BEGIN TRANSACTION;";
+constexpr char* const COMMIT = "COMMIT;";
+
 constexpr char* const CHECK_TABLE_QUERY = R"d(
 SELECT name 
 FROM   sqlite_master 
