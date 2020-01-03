@@ -6,7 +6,8 @@
 
 namespace {
 	constexpr char* const kHost = u8"herbsutter.com";
-	constexpr char* const kArchivePath = u8"/";
+	constexpr char* const kIndexPath = u8"/";
+	constexpr char* const kPagePath = u8"page/";
 
 	// css selector
 	constexpr char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
@@ -15,13 +16,6 @@ namespace {
 	constexpr char* const kSelectorContentTag = u8"div.entry-content";
 	constexpr char* const kSelectorImgTag = u8"img";
 
-	// tag name
-	constexpr char* const kArticleTagName = u8"article";
-
-	// tag attribute
-	constexpr char* const kUrlAttribute = u8"href";
-	constexpr char* const kSrcAttribute = u8"src";
-
 }
 
 namespace crawler
@@ -29,7 +23,6 @@ namespace crawler
 
 namespace blog
 {
-
 
 HerbsutterBlogCrawler::HerbsutterBlogCrawler(
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao)
@@ -46,9 +39,9 @@ const char* const HerbsutterBlogCrawler::GetHost() const
 	return kHost;
 }
 
-const char* const HerbsutterBlogCrawler::GetArchivePath() const
+const char* const HerbsutterBlogCrawler::GetIndexPath() const
 {
-	return kArchivePath;
+	return kIndexPath;
 }
 
 const char* const HerbsutterBlogCrawler::GetSelectorForArchivesTag() const
@@ -66,13 +59,40 @@ const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 	return kUrlAttribute;
 }
 
-bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
+SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
+{
+	SiteInfo pageInfo;
+
+	pageInfo.emplace_back(kIndexPath, GetMainDocument());
+	auto pageIndex = 1;
+
+	while (true)
+	{
+		std::string path(kIndexPath);
+		path.append(kPagePath);
+		path.append(std::to_string(++pageIndex));
+		path.append("/");
+
+		auto site = RequestAndGetDoc(path);
+
+		if (site.second.get() == nullptr)
+		{
+			break;
+		}
+
+		pageInfo.emplace_back( site.first, std::move(site.second));
+	}
+
+	return pageInfo;
+}
+
+bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 {
 	model::ArticleList articles;
 
-	for (auto& htmlDoc : htmlDocs)
+	for (auto& HtmlDocument : HtmlDocuments)
 	{
-		auto articleSelections = htmlDoc->find(kArticleTagName);
+		auto articleSelections = HtmlDocument.second->find(kArticleTagName);
 		auto articleNum = articleSelections.nodeNum();
 
 		for (auto i = 0; i < articleNum; ++i)
@@ -111,7 +131,7 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(HtmlDocList& htmlDocs)
 	return true;
 }
 
-void HerbsutterBlogCrawler::CatchExceptionalUrlCase(std::string & url)
+void HerbsutterBlogCrawler::CatchExceptionalUrlCase(std::string& url)
 {
 	/* Do nothing in this class */
 }

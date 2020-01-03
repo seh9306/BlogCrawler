@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "BlogCrawler.h"
-
-
 #include <Node.h>
 
 #include "HttpClient.h"
@@ -25,21 +23,9 @@ BlogCrawler::~BlogCrawler()
 
 bool BlogCrawler::Crawl()
 {
-	auto archiveUrls = GetArchiveUrls();
+	auto pageSiteInfos = GetPageSiteInfos();
 
-	if (archiveUrls.empty())
-	{
-		return false;
-	}
-
-	auto archiveDocs = ReqeustAndGetArchiveDocs(archiveUrls);
-
-	if (archiveDocs.empty())
-	{
-		return false;
-	}
-
-	if (GetAndInsertArticles(archiveDocs))
+	if (GetAndInsertArticles(pageSiteInfos))
 	{
 		return false;
 	}
@@ -47,76 +33,63 @@ bool BlogCrawler::Crawl()
 	return true;
 }
 
-std::string BlogCrawler::DownloadImage(std::string & url)
+std::string BlogCrawler::DownloadImage(std::string& url)
 {
 	return std::string();
 }
 
-UrlList BlogCrawler::GetArchiveUrls()
+Site BlogCrawler::RequestAndGetDoc(std::string path)
 {
-	boost::asio::io_context ioContext;
-	tcp::resolver resolver(ioContext);
+	boost::asio::io_context ioContextToGetArticles;
+	tcp::resolver resolver(ioContextToGetArticles);
 	tcp::resolver::query query(GetHost(), "https");
 	auto endpoints = resolver.resolve(query);
 
-	util::HttpClient httpClient(ioContext, ctx_, endpoints, GetHost(), GetArchivePath());
-	ioContext.run();
+	auto httpClient = std::make_unique<util::HttpClient>(ioContextToGetArticles, ctx_, endpoints, GetHost(), path.c_str());
 
-	auto buf = httpClient.GetResponseBuf();
-	size_t size = httpClient.GetResponseSize();
+	ioContextToGetArticles.run();
 
-	std::string page(buf, size);
-	Document doc;
-	doc.parse(page);
-
-	CSelection archiveSelection = doc.find(GetSelectorForArchivesTag());
-	size_t archiveNum = archiveSelection.nodeNum();
-
-	std::vector<std::string> urls;
-	urls.reserve(archiveNum);
-
-	for (int i = 0; i < 3/*archiveNum*/; ++i)
+	auto statusCode = httpClient->GetStatusCode();
+	if (statusCode != util::HttpClient::kResponseOK)
 	{
-		auto archiveItem = archiveSelection.nodeAt(i);
-		auto selectionItem = archiveItem.find(GetSelectorForUrlTag());
-		auto urlTag = selectionItem.nodeAt(0);
-		auto url = urlTag.attribute(GetAttributeNameForUrl());
-
-		CatchExceptionalUrlCase(url);
-
-		if (!url.empty())
-		{
-			urls.push_back(url);
-		}
+		return { path, nullptr };
 	}
 
-	return urls;
+	auto bufPerClient = httpClient->GetResponseBuf();
+	auto sizePerClient = httpClient->GetResponseSize();
+
+	std::string pagePerClient(bufPerClient, sizePerClient);
+		 
+	auto htmlDocument = std::make_unique<HtmlDocument>();;
+	htmlDocument->parse(pagePerClient);
+	
+	return { path, std::move(htmlDocument) };
 }
 
-HtmlDocList BlogCrawler::ReqeustAndGetArchiveDocs(UrlList& urls)
+SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 {
 	auto urlSize = urls.size();
 
 	std::vector<std::unique_ptr<util::HttpClient>> httpClients;
 	httpClients.reserve(urlSize);
 
-	boost::asio::io_context ioContextToGetArticles;
-	tcp::resolver resolver(ioContextToGetArticles);
-	tcp::resolver::query query(GetHost(), "https");
-	auto endpoints = resolver.resolve(query);
-
 	for (auto i = 0; i < urlSize; ++i)
 	{
+		boost::asio::io_context ioContextToGetArticles;
+		tcp::resolver resolver(ioContextToGetArticles);
+		tcp::resolver::query query(GetHost(), "https");
+		auto endpoints = resolver.resolve(query);
+
 		auto path = urls.at(i).c_str();
 
 		httpClients.emplace_back(
 			std::make_unique<util::HttpClient>(ioContextToGetArticles, ctx_, endpoints, GetHost(), path)
 		);
+
+		ioContextToGetArticles.run();
 	}
 
-	ioContextToGetArticles.run();
-
-	std::vector<std::unique_ptr<Document>> archiveDocs;
+	SiteInfo archiveInfos;
 
 	for (auto i = 0; i < urlSize; ++i)
 	{
@@ -125,11 +98,35 @@ HtmlDocList BlogCrawler::ReqeustAndGetArchiveDocs(UrlList& urls)
 		auto sizePerClient = client->GetResponseSize();
 
 		std::string pagePerClient(bufPerClient, sizePerClient);
-		archiveDocs.push_back(std::make_unique<Document>());
-		archiveDocs.at(i)->parse(pagePerClient);		
+		archiveInfos.emplace_back(urls.at(i), std::make_unique<HtmlDocument>());
+
+		auto& htmlDocument = archiveInfos.at(i).second;
+		htmlDocument->parse(pagePerClient);
 	}
 
-	return archiveDocs;
+	return archiveInfos;
+}
+
+std::unique_ptr<HtmlDocument> BlogCrawler::GetMainDocument()
+{
+	auto host = GetHost();
+
+	boost::asio::io_context ioContext;
+	tcp::resolver resolver(ioContext);
+	tcp::resolver::query query(host, "https");
+	auto endpoints = resolver.resolve(query);
+
+	util::HttpClient httpClient(ioContext, ctx_, endpoints, host, GetIndexPath());
+	ioContext.run();
+
+	auto buf = httpClient.GetResponseBuf();
+	size_t size = httpClient.GetResponseSize();
+
+	std::string page(buf, size);
+	auto htmlDocument = std::make_unique<HtmlDocument>();
+	htmlDocument->parse(page);
+
+	return htmlDocument;
 }
 
 }
