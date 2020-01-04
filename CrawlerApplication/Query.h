@@ -1,6 +1,9 @@
 #ifndef QUERY_QUERY_H
 #define QUERY_QUERY_H
 
+namespace query
+{
+
 constexpr char* const BEGIN_TRANSACTION = "BEGIN TRANSACTION;";
 constexpr char* const COMMIT = "COMMIT;";
 
@@ -43,5 +46,7 @@ FROM ARTICLE
 WHERE content LIKE '%)d";
 
 constexpr char* const SELECT_LIKE_ARTICLES_QUERY_END = "%';";
+
+}
 
 #endif
