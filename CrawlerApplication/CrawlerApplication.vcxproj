@@ -203,7 +203,6 @@
     <ClInclude Include="BlogArticleDao.h" />
     <ClInclude Include="BlogCrawler.h" />
     <ClInclude Include="BlogCrawlService.h" />
-    <ClInclude Include="CCustomListCtrl.h" />
     <ClInclude Include="CrawlerApplication.h" />
     <ClInclude Include="CrawlerApplicationDlg.h" />
     <ClInclude Include="CrawlService.h" />
@@ -220,7 +219,6 @@
     <ClCompile Include="BlogArticleDao.cpp" />
     <ClCompile Include="BlogCrawler.cpp" />
     <ClCompile Include="BlogCrawlService.cpp" />
-    <ClCompile Include="CCustomListCtrl.cpp" />
     <ClCompile Include="CrawlerApplication.cpp" />
     <ClCompile Include="CrawlerApplicationDlg.cpp" />
     <ClCompile Include="CrawlService.cpp" />

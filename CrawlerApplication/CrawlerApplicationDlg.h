@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "Article.h"
-#include "CCustomListCtrl.h"
 
 namespace dao
 {
@@ -51,7 +50,7 @@ private:
 	CProgressCtrl progressCtrl_;
 	CEdit searchEdit_;
 	CButton searchButton_;
-	CCustomListCtrl searchList_;
+	CListCtrl searchList_;
 	CImageList imageList_;
 
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;

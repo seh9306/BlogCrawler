@@ -79,7 +79,6 @@
     <ClInclude Include="Query.h">
       <Filter>src\query</Filter>
     </ClInclude>
-    <ClInclude Include="CCustomListCtrl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -112,7 +111,6 @@
     <ClCompile Include="BlogArticleDao.cpp">
       <Filter>src\dao</Filter>
     </ClCompile>
-    <ClCompile Include="CCustomListCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CrawlerApplication.rc">
