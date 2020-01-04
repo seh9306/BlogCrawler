@@ -9,6 +9,8 @@
 
 #include <thread>
 
+#include "BlogArticleDao.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -60,7 +62,11 @@ CCrawlerApplicationDlg::CCrawlerApplicationDlg(CWnd* pParent /*=nullptr*/)
 void CCrawlerApplicationDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_BUTTON1, crawlingButton);
+	DDX_Control(pDX, IDC_BUTTON1, crawlingButton_);
+	DDX_Control(pDX, IDC_PROGRESS1, progressCtrl_);
+	DDX_Control(pDX, IDC_EDIT1, searchEdit_);
+	DDX_Control(pDX, IDC_BUTTON2, searchButton_);
+	DDX_Control(pDX, IDC_LIST1, searchList_);
 }
 
 BEGIN_MESSAGE_MAP(CCrawlerApplicationDlg, CDialogEx)
@@ -68,6 +74,8 @@ BEGIN_MESSAGE_MAP(CCrawlerApplicationDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CCrawlerApplicationDlg::OnBnClickedCrawlingButton)
+	ON_BN_CLICKED(IDC_BUTTON2, &CCrawlerApplicationDlg::OnClickedSearchButton)
+	ON_NOTIFY(LVN_GETDISPINFO, IDC_LIST1, &CCrawlerApplicationDlg::OnGetdispinfoArticleList)
 END_MESSAGE_MAP()
 
 
@@ -82,7 +90,7 @@ BOOL CCrawlerApplicationDlg::OnInitDialog()
 	// IDM_ABOUTBOX는 시스템 명령 범위에 있어야 합니다.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
-
+	
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != nullptr)
 	{
@@ -158,6 +166,7 @@ HCURSOR CCrawlerApplicationDlg::OnQueryDragIcon()
 
 void CCrawlerApplicationDlg::OnBnClickedCrawlingButton()
 {
+	crawlingButton_.EnableWindow(FALSE);
 	std::thread([&] {
 		auto app = reinterpret_cast<CCrawlerApplicationApp*>(AfxGetApp());
 
@@ -167,4 +176,61 @@ void CCrawlerApplicationDlg::OnBnClickedCrawlingButton()
 		}
 
 	}).detach();
+}
+
+void CCrawlerApplicationDlg::OnClickedSearchButton()
+{
+	searchButton_.EnableWindow(FALSE);
+	std::thread([&] {
+		CString searchCstring;
+		searchEdit_.GetWindowTextW(searchCstring);
+
+		std::string search = converter_.to_bytes(searchCstring.GetBuffer());
+
+		articles_ = std::move(blogArticleDao_->SelectArticles(search));
+		
+		searchList_.SetItemCountEx(articles_.size());
+		searchButton_.EnableWindow(TRUE);
+	}).detach();
+}
+
+void CCrawlerApplicationDlg::SetArticleBlogDao(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao)
+{
+	blogArticleDao_ = blogArticleDao;
+}
+
+
+void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+	LV_ITEM* pItem = reinterpret_cast<LV_ITEM*>(&(pDispInfo)->item);
+
+	if (pItem == NULL) return;
+
+	int nRow = pItem->iItem;
+	int nCol = pItem->iSubItem;
+
+	if (nRow < 0 || nRow >= articles_.size())
+	{
+		return;
+	}
+
+	auto article = articles_.at(nRow);
+	auto content = converter_.from_bytes(article.content_);
+
+	if (pItem->pszText) //이값이 널로 올 때도 당연히 있음.
+	{
+		switch (nCol)
+		{
+		case 0:
+			lstrcpy(pItem->pszText, content.c_str()/*nRow, 0번 열에 들어갈 문자열*/);
+			break;
+		case 1:
+			lstrcpy(pItem->pszText, L""/*nRow, 1번 열에 들어갈 문자열*/);
+			break;
+		}
+
+	}
+
+	*pResult = 0;
 }
