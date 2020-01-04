@@ -13,7 +13,7 @@ class DevMicrosoftBlogCrawler :
 	public BlogCrawler
 {
 public:
-	DevMicrosoftBlogCrawler(std::shared_ptr<dao::BlogArticleDao> blogArticleDao);
+	DevMicrosoftBlogCrawler();
 	~DevMicrosoftBlogCrawler();
 
 private:

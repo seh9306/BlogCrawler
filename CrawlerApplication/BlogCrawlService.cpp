@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BlogCrawlService.h"
 
+#include "BlogCrawler.h"
 #include "HerbsutterBlogCrawler.h"
 #include "DevMicrosoftBlogCrawler.h"
 
@@ -17,12 +18,16 @@ BlogCrawlService::~BlogCrawlService()
 
 void BlogCrawlService::CreateCrawlers()
 {
-	auto blogArticleDao = std::make_shared<dao::BlogArticleDao>();
+	crawlers.push_back(std::make_unique<crawler::blog::HerbsutterBlogCrawler>());
+	crawlers.push_back(std::make_unique<crawler::blog::DevMicrosoftBlogCrawler>());
+}
 
-	blogArticleDao->Initialize();
-
-	crawlers.push_back(std::make_unique<crawler::blog::HerbsutterBlogCrawler>(blogArticleDao));
-	crawlers.push_back(std::make_unique<crawler::blog::DevMicrosoftBlogCrawler>(blogArticleDao));
+void BlogCrawlService::SetDao(void* dao)
+{
+	for (auto& crawler : crawlers)
+	{
+		crawler->SetDao(dao);
+	}
 }
 
 }

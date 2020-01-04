@@ -6,8 +6,14 @@
 #include <memory>
 #include <vector>
 
-#include "BlogArticleDao.h"
 #include "Crawler.h"
+
+namespace dao
+{
+
+class BlogArticleDao;
+
+}
 
 namespace crawler
 {
@@ -32,10 +38,11 @@ class BlogCrawler
 	: public Crawler
 {
 public:
-	BlogCrawler(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao);
+	BlogCrawler();
 	virtual ~BlogCrawler();
 
 	bool Crawl() override;
+	void SetDao(void* dao) override;
 
 protected:
 	std::string DownloadImage(std::string& url);

@@ -18,6 +18,11 @@
 // 이 클래스의 구현에 대해서는 BlogCrawlerApplication.cpp을(를) 참조하세요.
 //
 
+namespace dao
+{
+	class BlogArticleDao;
+}
+
 class CCrawlerApplicationApp : public CWinApp
 {
 public:
@@ -27,9 +32,10 @@ public:
 	void RunCrawlService() const;
 
 private:
-	void InitServices();
+	void Initialize();
 
-	std::vector<std::unique_ptr<service::CrawlService>> crawlSerivces;
+	std::vector<std::unique_ptr<service::CrawlService>> crawlSerivces_;
+	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 
 	DECLARE_MESSAGE_MAP()
 };

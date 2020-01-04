@@ -14,6 +14,7 @@ public:
 	~BlogCrawlService();
 	
 	void CreateCrawlers() override;
+	void SetDao(void* dao) override;
 };
 
 }

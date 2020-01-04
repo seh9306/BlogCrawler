@@ -4,8 +4,16 @@
 
 #pragma once
 
+#include <codecvt>
 #include <memory>
 #include <vector>
+
+#include "Article.h"
+
+namespace dao
+{
+class BlogArticleDao;
+}
 
 // CBlogCrawlerApplicationDlg 대화 상자
 class CCrawlerApplicationDlg : public CDialogEx
@@ -14,6 +22,8 @@ class CCrawlerApplicationDlg : public CDialogEx
 public:
 	CCrawlerApplicationDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
 
+	void SetArticleBlogDao(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao);
+	
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_BLOGCRAWLERAPPLICATION_DIALOG };
@@ -30,9 +40,20 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnBnClickedCrawlingButton();
+	afx_msg void OnClickedSearchButton();
+	afx_msg void OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult);
 
 private:
-	CButton crawlingButton;
+	CButton crawlingButton_;
+	CProgressCtrl progressCtrl_;
+	CEdit searchEdit_;
+	CButton searchButton_;
+	CListCtrl searchList_;
 
+	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
+	model::ArticleList articles_;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter_;
+	
 	DECLARE_MESSAGE_MAP()
+	
 };

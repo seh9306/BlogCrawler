@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BlogCrawlService.h"
+#include "BlogArticleDao.h"
 #include "CrawlerApplication.h"
 #include "CrawlerApplicationDlg.h"
 
@@ -64,10 +65,12 @@ BOOL CCrawlerApplicationApp::InitInstance()
 
 	SetRegistryKey(_T("Crawler"));
 
-	InitServices();
-	
+	Initialize();
+
 	CCrawlerApplicationDlg dlg;
+	dlg.SetArticleBlogDao(blogArticleDao_);
 	m_pMainWnd = &dlg;
+
 	INT_PTR nResponse = dlg.DoModal();
 
 	if (nResponse == -1)
@@ -93,19 +96,23 @@ BOOL CCrawlerApplicationApp::InitInstance()
 
 void CCrawlerApplicationApp::RunCrawlService() const
 {
-	for (auto& crawlService : crawlSerivces)
+	for (auto& crawlService : crawlSerivces_)
 	{
 		crawlService->Execute();
 	}
 }
 
-void CCrawlerApplicationApp::InitServices()
+void CCrawlerApplicationApp::Initialize()
 {
-	crawlSerivces.push_back(std::make_unique<service::BlogCrawlService>());
+	blogArticleDao_ = std::make_shared<dao::BlogArticleDao>();
 
-	for (auto& crawlService : crawlSerivces)
+	blogArticleDao_->Initialize();
+
+	crawlSerivces_.push_back(std::make_unique<service::BlogCrawlService>());
+
+	for (auto& crawlService : crawlSerivces_)
 	{
 		crawlService->CreateCrawlers();
+		crawlService->SetDao(static_cast<void*>(&blogArticleDao_));
 	}
 }
-

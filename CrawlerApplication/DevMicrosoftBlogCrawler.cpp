@@ -4,19 +4,21 @@
 #include <Document.h>
 #include <Node.h>
 
-#include "HttpClient.h"
+#include "Article.h"
+#include "BlogArticleDao.h"
 
 namespace {
-	constexpr char* const kHost = u8"devblogs.microsoft.com";
-	constexpr char* const kIndexPath = u8"/oldnewthing/";
-	constexpr char* const kPagePath = u8"page/";
 
-	// css selector
-	constexpr char* const kSelectorForArchivesTag = u8"div.listdisplay li"; // "#wrapper-footer > div:nth-child(1) > div > div:nth-child(1) > div > div > div > li";
-	constexpr char* const kSelectorForUrlTag = u8"a";
-	constexpr char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
-	constexpr char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
-	constexpr char* const kSelectorForTitle = u8"#featured > div > h1";
+constexpr char* const kHost = u8"devblogs.microsoft.com";
+constexpr char* const kIndexPath = u8"/oldnewthing/";
+constexpr char* const kPagePath = u8"page/";
+
+// css selector
+constexpr char* const kSelectorForArchivesTag = u8"div.listdisplay li"; // "#wrapper-footer > div:nth-child(1) > div > div:nth-child(1) > div > div > div > li";
+constexpr char* const kSelectorForUrlTag = u8"a";
+constexpr char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
+constexpr char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
+constexpr char* const kSelectorForTitle = u8"#featured > div > h1";
 
 }
 
@@ -26,9 +28,7 @@ namespace crawler
 namespace blog
 {
 
-DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler(
-	std::shared_ptr<dao::BlogArticleDao> blogArticleDao)
-	: BlogCrawler(blogArticleDao)
+DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler()
 {
 }
 

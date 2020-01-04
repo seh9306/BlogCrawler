@@ -13,7 +13,7 @@ class HerbsutterBlogCrawler :
 	public BlogCrawler
 {
 public:
-	HerbsutterBlogCrawler(std::shared_ptr<dao::BlogArticleDao>);
+	HerbsutterBlogCrawler();
 	virtual ~HerbsutterBlogCrawler();
 
 private:

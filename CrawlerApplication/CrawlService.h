@@ -15,8 +15,10 @@ public:
 	CrawlService();
 	virtual ~CrawlService();
 
-	virtual void CreateCrawlers() = 0;
 	void Execute() const;
+
+	virtual void CreateCrawlers() = 0;
+	virtual void SetDao(void* dao) = 0;
 
 protected:
 	std::vector<std::unique_ptr<crawler::Crawler>> crawlers;

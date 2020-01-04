@@ -15,6 +15,7 @@ public:
 	virtual ~Crawler() {};
 
 	virtual bool Crawl() = 0;
+	virtual void SetDao(void* dao) = 0;
 };
 
 }

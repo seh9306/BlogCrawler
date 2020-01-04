@@ -4,17 +4,21 @@
 #include <Document.h>
 #include <Node.h>
 
-namespace {
-	constexpr char* const kHost = u8"herbsutter.com";
-	constexpr char* const kIndexPath = u8"/";
-	constexpr char* const kPagePath = u8"page/";
+#include "Article.h"
+#include "BlogArticleDao.h"
 
-	// css selector
-	constexpr char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
-	constexpr char* const kSelectorForUrlTag = u8"a";
-	constexpr char* const kSelectorTitleAndUrlTag = u8"header > h1 > a";
-	constexpr char* const kSelectorContentTag = u8"div.entry-content";
-	constexpr char* const kSelectorImgTag = u8"img";
+namespace {
+
+constexpr char* const kHost = u8"herbsutter.com";
+constexpr char* const kIndexPath = u8"/";
+constexpr char* const kPagePath = u8"page/";
+
+// css selector
+constexpr char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
+constexpr char* const kSelectorForUrlTag = u8"a";
+constexpr char* const kSelectorTitleAndUrlTag = u8"header > h1 > a";
+constexpr char* const kSelectorContentTag = u8"div.entry-content";
+constexpr char* const kSelectorImgTag = u8"img";
 
 }
 
@@ -24,9 +28,7 @@ namespace crawler
 namespace blog
 {
 
-HerbsutterBlogCrawler::HerbsutterBlogCrawler(
-	std::shared_ptr<dao::BlogArticleDao> blogArticleDao)
-	: BlogCrawler(blogArticleDao)
+HerbsutterBlogCrawler::HerbsutterBlogCrawler()
 {
 }
 

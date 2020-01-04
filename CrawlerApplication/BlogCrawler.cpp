@@ -2,6 +2,7 @@
 #include "BlogCrawler.h"
 #include <Node.h>
 
+#include "BlogArticleDao.h"
 #include "HttpClient.h"
 
 namespace crawler
@@ -10,9 +11,8 @@ namespace crawler
 namespace blog
 {
 
-BlogCrawler::BlogCrawler(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao)
-	: blogArticleDao_(blogArticleDao),
-	ctx_(boost::asio::ssl::context::sslv23)
+BlogCrawler::BlogCrawler()
+	: ctx_(boost::asio::ssl::context::sslv23)
 {
 	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
 }
@@ -31,6 +31,11 @@ bool BlogCrawler::Crawl()
 	}
 
 	return true;
+}
+
+void BlogCrawler::SetDao(void* dao)
+{
+	blogArticleDao_ = *(static_cast<std::shared_ptr<dao::BlogArticleDao>*>(dao));
 }
 
 std::string BlogCrawler::DownloadImage(std::string& url)
