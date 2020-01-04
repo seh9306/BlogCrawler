@@ -46,6 +46,7 @@ public:
 
 	bool InsertArticles(model::ArticleList& articles);
 	model::ArticleList SelectArticles();
+	model::ArticleList SelectArticles(std::string search);
 
 	bool DBopen();
 

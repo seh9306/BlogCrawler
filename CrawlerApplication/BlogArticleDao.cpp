@@ -10,58 +10,61 @@ using std::placeholders::_4;
 
 namespace 
 {
-	constexpr char* const kDbFilePath = u8"blog_article.db";
 
-	constexpr char* const articleTableName = "ARTICLE";
+constexpr char* const kDbFilePath = u8"blog_article.db";
 
-	constexpr int kZeroEndString = -1;
+constexpr char* const articleTableName = "ARTICLE";
 
-	constexpr int kBadAction = -1;
-	constexpr int kSqliteOK = SQLITE_OK;
+constexpr int kZeroEndString = -1;
 
-	int ArticleTableCheck(void *data, int argc, char **argv, char **azColName) 
+constexpr int kBadAction = -1;
+constexpr int kSqliteOK = SQLITE_OK;
+
+int ArticleTableCheck(void *data, int argc, char **argv, char **azColName) 
+{
+	auto existTable = static_cast<bool*>(data);
+
+	if (!(*existTable))
 	{
-		auto existTable = static_cast<bool*>(data);
-
-		if (!(*existTable))
+		if (std::strcmp(articleTableName, argv[0]) == 0)
 		{
-			if (std::strcmp(articleTableName, argv[0]) == 0)
-			{
-				*existTable = true;
-			}
-			
+			*existTable = true;
 		}
-
-		return kSqliteOK;
+		
 	}
 
-	int Select(void *data, int argc, char **argv, char **azColName) 
+	return kSqliteOK;
+}
+
+int Select(void *data, int argc, char **argv, char **azColName) 
+{
+	auto articleActionData = static_cast<dao::ArticleActionData*>(data);
+	auto actionData = articleActionData->actionData_;
+	auto& actions = actionData.actions_;
+	auto action = actions.find(actionData.actionIndex_);
+
+	if (action == actions.end())
 	{
-		auto articleActionData = static_cast<dao::ArticleActionData*>(data);
-		auto actionData = articleActionData->actionData_;
-		auto& actions = actionData.actions_;
-		auto action = actions.find(actionData.actionIndex_);
-
-		if (action == actions.end())
-		{
-			return kBadAction;
-		}
-
-		return action->second(argc, argv, azColName, &(articleActionData->articles_));
+		return kBadAction;
 	}
 
-	int DoNothing(void *null, int argc, char **argv, char **azColName) 
-	{
-		return kSqliteOK;
-	}
+	return action->second(argc, argv, azColName, &(articleActionData->articles_));
+}
 
-	constexpr int kSelectAllAritcle = 0;
+int DoNothing(void *null, int argc, char **argv, char **azColName) 
+{
+	return kSqliteOK;
+}
 
-	constexpr int kId = 0;
-	constexpr int kTitle = 1;
-	constexpr int kUrl = 2;
-	constexpr int kImagePath = 3;
-	constexpr int kContent = 4;
+constexpr int kSelectAllAritcle = 0;
+
+constexpr int kId = 0;
+constexpr int kTitle = 1;
+constexpr int kUrl = 2;
+constexpr int kImagePath = 3;
+constexpr int kContent = 4;
+
+constexpr int kSearch = 1;
 
 }
 
@@ -99,7 +102,7 @@ bool BlogArticleDao::Initialize()
 			return false;
 		}
 	}
-
+ 	
 	return true;
 }
 
@@ -137,6 +140,23 @@ model::ArticleList BlogArticleDao::SelectArticles()
 	model::ArticleList articles;
 
 	Sqlite3Exec(SELECT_ALL_ARTICLES_QUERY, kSelectAllAritcle, articles);
+
+	return articles;
+}
+
+model::ArticleList BlogArticleDao::SelectArticles(std::string search)
+{
+	sqlite3_stmt* pStmt = NULL;
+
+
+	std::string query(SELECT_LIKE_ARTICLES_QUERY_START);
+	query.append(search);
+	query.append(SELECT_LIKE_ARTICLES_QUERY_END);
+
+	model::ArticleList articles;
+	Sqlite3Exec(query.c_str(), kSelectAllAritcle, articles);
+
+	sqlite3_finalize(pStmt);
 
 	return articles;
 }

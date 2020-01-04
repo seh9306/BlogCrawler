@@ -37,4 +37,11 @@ SELECT *
 FROM ARTICLE;
 )d";
 
+constexpr char* const SELECT_LIKE_ARTICLES_QUERY_START = R"d(
+SELECT * 
+FROM ARTICLE 
+WHERE content LIKE '%)d";
+
+constexpr char* const SELECT_LIKE_ARTICLES_QUERY_END = "%';";
+
 #endif
