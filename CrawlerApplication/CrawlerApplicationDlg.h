@@ -6,9 +6,11 @@
 
 #include <codecvt>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "Article.h"
+#include "CCustomListCtrl.h"
 
 namespace dao
 {
@@ -48,12 +50,17 @@ private:
 	CProgressCtrl progressCtrl_;
 	CEdit searchEdit_;
 	CButton searchButton_;
-	CListCtrl searchList_;
+	CCustomListCtrl searchList_;
+	CImageList imageList_;
 
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 	model::ArticleList articles_;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter_;
+	std::unordered_map<int, int> imageInfoMap_;
 	
 	DECLARE_MESSAGE_MAP()
-	
+
+public:
+//	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
+
 };

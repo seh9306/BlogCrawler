@@ -12,7 +12,10 @@ namespace blog
 {
 
 BlogCrawler::BlogCrawler()
-	: ctx_(boost::asio::ssl::context::sslv23)
+	: pageIndex_(1),
+	requestPageNumberDegree_(10),
+	ctx_(boost::asio::ssl::context::sslv23),
+	blogArticleDao_(nullptr)
 {
 	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
 }
@@ -23,11 +26,21 @@ BlogCrawler::~BlogCrawler()
 
 bool BlogCrawler::Crawl()
 {
-	auto pageSiteInfos = GetPageSiteInfos();
+	pageIndex_ = 1;
 
-	if (GetAndInsertArticles(pageSiteInfos))
+	while (true)
 	{
-		return false;
+		auto pageSiteInfos = GetPageSiteInfos();
+
+		if (pageSiteInfos.size() < requestPageNumberDegree_)
+		{
+			break;
+		}
+
+		if (!GetAndInsertArticles(pageSiteInfos))
+		{
+			return false;
+		}
 	}
 
 	return true;

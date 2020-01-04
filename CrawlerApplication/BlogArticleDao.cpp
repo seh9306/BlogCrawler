@@ -148,7 +148,6 @@ model::ArticleList BlogArticleDao::SelectArticles(std::string search)
 {
 	sqlite3_stmt* pStmt = NULL;
 
-
 	std::string query(SELECT_LIKE_ARTICLES_QUERY_START);
 	query.append(search);
 	query.append(SELECT_LIKE_ARTICLES_QUERY_END);
@@ -172,7 +171,7 @@ int BlogArticleDao::SelectAllAritcle(int argc, char** argv, char** azColName, mo
 	{
 		return kBadAction;
 	}
-	ptrArticles->emplace_back(argv[kTitle], argv[kUrl], argv[kImagePath], argv[kContent]);
+	ptrArticles->emplace_back(std::stoi(argv[kId]), argv[kTitle], argv[kUrl], argv[kImagePath], argv[kContent]);
 
 	return kSqliteOK;
 }

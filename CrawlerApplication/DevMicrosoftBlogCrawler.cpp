@@ -74,6 +74,10 @@ SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 		{
 			auto& articleDoc = articlesSelector.nodeAt(i);
 			auto urlTagSelector = articleDoc.find(kSelectorForArticleUrlTag);
+			if (urlTagSelector.nodeNum() == 0)
+			{
+				continue;
+			}
 			auto urlTag = urlTagSelector.nodeAt(0);
 
 			articleUrls.emplace_back(urlTag.attribute(kUrlAttribute));
@@ -130,7 +134,16 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 			continue;
 		}
 
+		if (titleSelector.nodeNum() == 0)
+		{
+			continue;
+		}
 		auto titleNode = titleSelector.nodeAt(0);
+
+		if (articleSelector.nodeNum() == 0)
+		{
+			continue;
+		}
 		auto articleNode = articleSelector.nodeAt(0);
 
 		auto imgTagSelection = articleNode.find(kImgTagName);

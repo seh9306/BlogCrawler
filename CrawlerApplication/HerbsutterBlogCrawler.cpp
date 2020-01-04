@@ -7,7 +7,8 @@
 #include "Article.h"
 #include "BlogArticleDao.h"
 
-namespace {
+namespace 
+{
 
 constexpr char* const kHost = u8"herbsutter.com";
 constexpr char* const kIndexPath = u8"/";
@@ -65,14 +66,17 @@ SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 {
 	SiteInfo pageInfo;
 
-	pageInfo.emplace_back(kIndexPath, GetMainDocument());
-	auto pageIndex = 1;
-
-	while (true)
+	if (pageIndex_ == 1)
+	{
+		pageInfo.emplace_back(kIndexPath, GetMainDocument());
+	}
+	
+	int nowPageIndex = pageIndex_;
+	while(nowPageIndex < pageIndex_ + requestPageNumberDegree_)
 	{
 		std::string path(kIndexPath);
 		path.append(kPagePath);
-		path.append(std::to_string(++pageIndex));
+		path.append(std::to_string(++nowPageIndex));
 		path.append("/");
 
 		auto site = RequestAndGetDoc(path);
@@ -84,6 +88,8 @@ SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 
 		pageInfo.emplace_back( site.first, std::move(site.second));
 	}
+
+	pageIndex_ = nowPageIndex;
 
 	return pageInfo;
 }
@@ -101,6 +107,10 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 		{
 			auto articleSelection = articleSelections.nodeAt(i);
 			auto titleAndUrlTagSelection = articleSelection.find(kSelectorTitleAndUrlTag);
+			if (titleAndUrlTagSelection.nodeNum() == 0)
+			{
+				continue;
+			}
 			auto titleAndUrlTag = titleAndUrlTagSelection.nodeAt(0);
 
 			model::Article article;
@@ -109,17 +119,24 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 			article.url_ = titleAndUrlTag.attribute(kUrlAttribute);
 
 			auto contentTagSelection = articleSelection.find(kSelectorContentTag);
-			auto contentTag = contentTagSelection.nodeAt(0);
 
-			article.content_ = contentTag.text();
-
-			auto imgTagSelection = contentTag.find(kSelectorImgTag);
-
-			if (imgTagSelection.nodeNum() != 0)
+			if (contentTagSelection.nodeNum() == 0) 
 			{
-				auto url = imgTagSelection.nodeAt(0).attribute(kSrcAttribute);
-				article.imagePath_ = DownloadImage(url);
+				article.content_ = "잘못된 값";
 			}
+			else 
+			{
+				auto contentTag = contentTagSelection.nodeAt(0);
+
+				article.content_ = contentTag.text();
+				auto imgTagSelection = contentTag.find(kSelectorImgTag);
+
+				if (imgTagSelection.nodeNum() != 0)
+				{
+					auto url = imgTagSelection.nodeAt(0).attribute(kSrcAttribute);
+					article.imagePath_ = DownloadImage(url);
+				}
+			}			
 
 			articles.emplace_back(article);
 		}
