@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CCrawlerApplicationDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CCrawlerApplicationDlg::OnBnClickedCrawlingButton)
 	ON_BN_CLICKED(IDC_BUTTON2, &CCrawlerApplicationDlg::OnClickedSearchButton)
 	ON_NOTIFY(LVN_GETDISPINFO, IDC_LIST1, &CCrawlerApplicationDlg::OnGetdispinfoArticleList)
+	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CCrawlerApplicationDlg::OnArticleItemClickList)
 END_MESSAGE_MAP()
 
 
@@ -110,6 +111,8 @@ BOOL CCrawlerApplicationDlg::OnInitDialog()
 	searchList_.InsertColumn(0, TEXT("thumnail"), LVCFMT_LEFT, rect.Width()*0.4);
 	searchList_.InsertColumn(1, TEXT("title"), LVCFMT_LEFT, rect.Width()*0.3);
 	searchList_.InsertColumn(2, TEXT("url"), LVCFMT_LEFT, rect.Width()*0.3);
+
+	searchList_.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 
 	// 이 대화 상자의 아이콘을 설정합니다.  응용 프로그램의 주 창이 대화 상자가 아닐 경우에는
 	//  프레임워크가 이 작업을 자동으로 수행합니다.
@@ -250,6 +253,23 @@ void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pR
 	{
 		pItem->iImage = 0;
 	}
+
+	*pResult = 0;
+}
+
+void CCrawlerApplicationDlg::OnArticleItemClickList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	if (pNMItemActivate->iItem < 0 || pNMItemActivate->iItem > articles_.size())
+	{
+		return;
+	}
+
+	auto article = articles_.at(pNMItemActivate->iItem);
+	auto url = converter_.from_bytes(article.url_);
+	
+	ShellExecute(NULL, L"open", url.c_str(), L"", L"", SW_SHOW);
 
 	*pResult = 0;
 }

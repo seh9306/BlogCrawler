@@ -44,6 +44,7 @@ protected:
 	afx_msg void OnBnClickedCrawlingButton();
 	afx_msg void OnClickedSearchButton();
 	afx_msg void OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnArticleItemClickList(NMHDR *pNMHDR, LRESULT *pResult);
 
 private:
 	CButton crawlingButton_;
@@ -59,8 +60,5 @@ private:
 	std::unordered_map<int, int> imageInfoMap_;
 	
 	DECLARE_MESSAGE_MAP()
-
-public:
-//	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 
 };
