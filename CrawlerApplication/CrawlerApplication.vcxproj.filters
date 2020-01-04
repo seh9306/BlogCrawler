@@ -32,6 +32,9 @@
     <Filter Include="src\query">
       <UniqueIdentifier>{a6816713-462d-4d7e-b36a-b49a50f4f51c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\observer">
+      <UniqueIdentifier>{34c592b3-cdf2-4cdd-abc5-514fc06b22c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -79,6 +82,12 @@
     <ClInclude Include="Query.h">
       <Filter>src\query</Filter>
     </ClInclude>
+    <ClInclude Include="ProgressObserver.h">
+      <Filter>src\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressSubject.h">
+      <Filter>src\observer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -110,6 +119,12 @@
     </ClCompile>
     <ClCompile Include="BlogArticleDao.cpp">
       <Filter>src\dao</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressObserver.cpp">
+      <Filter>src\observer</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressSubject.cpp">
+      <Filter>src\observer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

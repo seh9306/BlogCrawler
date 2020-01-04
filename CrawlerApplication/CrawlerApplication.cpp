@@ -65,9 +65,13 @@ BOOL CCrawlerApplicationApp::InitInstance()
 
 	SetRegistryKey(_T("Crawler"));
 
-	Initialize();
-
 	CCrawlerApplicationDlg dlg;
+
+	observer::ObserverList observers;
+	observers.emplace_back(&dlg);
+
+	Initialize(observers);
+	
 	dlg.SetArticleBlogDao(blogArticleDao_);
 	m_pMainWnd = &dlg;
 
@@ -102,7 +106,7 @@ void CCrawlerApplicationApp::RunCrawlService() const
 	}
 }
 
-void CCrawlerApplicationApp::Initialize()
+void CCrawlerApplicationApp::Initialize(observer::ObserverList& observers)
 {
 	blogArticleDao_ = std::make_shared<dao::BlogArticleDao>();
 
@@ -113,6 +117,7 @@ void CCrawlerApplicationApp::Initialize()
 	for (auto& crawlService : crawlSerivces_)
 	{
 		crawlService->CreateCrawlers();
+		crawlService->SetProgressObserver(observers);
 		crawlService->SetDao(static_cast<void*>(&blogArticleDao_));
 	}
 }

@@ -32,7 +32,7 @@ public:
 	void RunCrawlService() const;
 
 private:
-	void Initialize();
+	void Initialize(observer::ObserverList& observers);
 
 	std::vector<std::unique_ptr<service::CrawlService>> crawlSerivces_;
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;

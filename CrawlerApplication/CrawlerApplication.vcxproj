@@ -210,9 +210,11 @@
     <ClInclude Include="DevMicrosoftBlogCrawler.h" />
     <ClInclude Include="HerbsutterBlogCrawler.h" />
     <ClInclude Include="HttpClient.h" />
+    <ClInclude Include="ProgressObserver.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Query.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ProgressSubject.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -225,12 +227,14 @@
     <ClCompile Include="DevMicrosoftBlogCrawler.cpp" />
     <ClCompile Include="HerbsutterBlogCrawler.cpp" />
     <ClCompile Include="HttpClient.cpp" />
+    <ClCompile Include="ProgressObserver.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ProgressSubject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CrawlerApplication.rc" />

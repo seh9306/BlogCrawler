@@ -118,6 +118,11 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 			article.title_ = titleAndUrlTag.text();
 			article.url_ = titleAndUrlTag.attribute(kUrlAttribute);
 
+			if (article.url_.empty())
+			{
+				continue;
+			}
+
 			auto contentTagSelection = articleSelection.find(kSelectorContentTag);
 
 			if (contentTagSelection.nodeNum() == 0) 

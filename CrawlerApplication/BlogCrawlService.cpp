@@ -22,6 +22,17 @@ void BlogCrawlService::CreateCrawlers()
 	//crawlers.push_back(std::make_unique<crawler::blog::DevMicrosoftBlogCrawler>());
 }
 
+void BlogCrawlService::SetProgressObserver(observer::ObserverList& observers)
+{
+	for (auto& crawler : crawlers)
+	{
+		for (auto& observer : observers)
+		{
+			crawler->Attach(observer);
+		}
+	}
+}
+
 void BlogCrawlService::SetDao(void* dao)
 {
 	for (auto& crawler : crawlers)

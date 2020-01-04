@@ -27,6 +27,7 @@ BlogCrawler::~BlogCrawler()
 bool BlogCrawler::Crawl()
 {
 	pageIndex_ = 1;
+	int notifyCount = 50;
 
 	while (true)
 	{
@@ -41,6 +42,8 @@ bool BlogCrawler::Crawl()
 		{
 			return false;
 		}
+
+		Notify(pageIndex_);
 	}
 
 	return true;

@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "Article.h"
+#include "ProgressObserver.h"
 
 namespace dao
 {
@@ -17,13 +18,17 @@ class BlogArticleDao;
 }
 
 // CBlogCrawlerApplicationDlg 대화 상자
-class CCrawlerApplicationDlg : public CDialogEx
+class CCrawlerApplicationDlg 
+	: public CDialogEx,
+	public observer::ProgressObserver
+
 {
 // 생성입니다.
 public:
 	CCrawlerApplicationDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
 
 	void SetArticleBlogDao(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao);
+	void Update(int progress) override;
 	
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME

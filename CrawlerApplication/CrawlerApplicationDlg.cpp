@@ -114,6 +114,7 @@ BOOL CCrawlerApplicationDlg::OnInitDialog()
 
 	searchList_.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 
+	progressCtrl_.SetRange(0, 100);
 	// 이 대화 상자의 아이콘을 설정합니다.  응용 프로그램의 주 창이 대화 상자가 아닐 경우에는
 	//  프레임워크가 이 작업을 자동으로 수행합니다.
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
@@ -180,7 +181,7 @@ void CCrawlerApplicationDlg::OnBnClickedCrawlingButton()
 		{
 			app->RunCrawlService();
 		}
-
+		progressCtrl_.SetPos(100);
 	}).detach();
 }
 
@@ -212,6 +213,11 @@ void CCrawlerApplicationDlg::OnClickedSearchButton()
 void CCrawlerApplicationDlg::SetArticleBlogDao(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao)
 {
 	blogArticleDao_ = blogArticleDao;
+}
+
+void CCrawlerApplicationDlg::Update(int progress)
+{
+	progressCtrl_.SetPos(progress);
 }
 
 void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult)
