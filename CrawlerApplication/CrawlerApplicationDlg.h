@@ -2,10 +2,9 @@
 #ifndef VIEW_CRAWLER_APPLICATION_H
 #define VIEW_CRAWLER_APPLICATION_H
 
-#pragma once
-
 #include <codecvt>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -28,7 +27,7 @@ public:
 	CCrawlerApplicationDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
 
 	void SetArticleBlogDao(std::shared_ptr<dao::BlogArticleDao>& blogArticleDao);
-	void Update(int progress) override;
+	void Update(observer::ProgressComplete progress) override;
 	
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -63,6 +62,8 @@ private:
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter_;
 	std::unordered_map<int, int> imageInfoMap_;
 	
+	std::mutex progressMutex_;
+
 	DECLARE_MESSAGE_MAP()
 
 };

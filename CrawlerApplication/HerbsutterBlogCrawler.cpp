@@ -6,6 +6,7 @@
 
 #include "Article.h"
 #include "BlogArticleDao.h"
+#include "ProgressDefine.h"
 
 namespace 
 {
@@ -87,8 +88,12 @@ SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 
 			urls.emplace_back(path);
 		}
+
+		Notify(observer::kCompleteHerbsutterBlogMakePageUrls);
 		
 		auto partSiteInfos = RequestAndGetDoc(urls);
+
+		Notify(observer::kCompleteHerbsutterBlogParsePages);
 
 		for (auto& siteInfo : partSiteInfos)
 		{
@@ -102,16 +107,18 @@ SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 	
 	}
 	
+	Notify(observer::kCompleteHerbsutterBlogReqeustAndGetPages);
+
 	return pageInfos;
 }
 
-bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
+bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 {
 	model::ArticleList articles;
 
-	for (auto& HtmlDocument : HtmlDocuments)
+	for (auto& pageSiteInfo : pageSiteInfos)
 	{
-		auto articleSelections = HtmlDocument.second->find(kArticleTagName);
+		auto articleSelections = pageSiteInfo.second->find(kArticleTagName);
 		auto articleNum = articleSelections.nodeNum();
 
 		for (auto i = 0; i < articleNum; ++i)
@@ -158,11 +165,15 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 		}
 	}
 
+	Notify(observer::kCompleteHerbsutterBlogMappingArticles);
+
 	if (!blogArticleDao_->InsertArticles(articles))
 	{
 		return false;
 	}
 
+	Notify(observer::kCompleteHerbsutterBlogInsertArticles);
+	
 	return true;
 }
 

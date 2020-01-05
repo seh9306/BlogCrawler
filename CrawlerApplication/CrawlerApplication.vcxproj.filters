@@ -94,6 +94,9 @@
     <ClInclude Include="HttpDefine.h">
       <Filter>src\util</Filter>
     </ClInclude>
+    <ClInclude Include="ProgressDefine.h">
+      <Filter>src\observer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

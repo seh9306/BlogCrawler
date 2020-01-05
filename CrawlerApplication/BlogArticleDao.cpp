@@ -13,14 +13,14 @@ namespace
 
 constexpr char* const kDbFilePath = u8"blog_article.db";
 
-constexpr char* const articleTableName = "ARTICLE";
+constexpr char* const articleTableName = u8"ARTICLE";
 
 constexpr int kZeroEndString = -1;
 
 constexpr int kBadAction = -1;
 constexpr int kSqliteOK = SQLITE_OK;
 
-int ArticleTableCheck(void *data, int argc, char **argv, char **azColName) 
+static int ArticleTableCheck(void *data, int argc, char **argv, char **azColName) 
 {
 	auto existTable = static_cast<bool*>(data);
 
@@ -36,7 +36,7 @@ int ArticleTableCheck(void *data, int argc, char **argv, char **azColName)
 	return kSqliteOK;
 }
 
-int Select(void *data, int argc, char **argv, char **azColName) 
+static int Select(void *data, int argc, char **argv, char **azColName) 
 {
 	auto articleActionData = static_cast<dao::ArticleActionData*>(data);
 	auto actionData = articleActionData->actionData_;
@@ -51,7 +51,7 @@ int Select(void *data, int argc, char **argv, char **azColName)
 	return action->second(argc, argv, azColName, &(articleActionData->articles_));
 }
 
-int DoNothing(void *null, int argc, char **argv, char **azColName) 
+static int DoNothing(void *null, int argc, char **argv, char **azColName) 
 {
 	return kSqliteOK;
 }
@@ -82,6 +82,8 @@ BlogArticleDao::~BlogArticleDao()
 
 bool BlogArticleDao::Initialize()
 {
+	sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
+
 	actions_[kSelectAllAritcle] 
 		= [this](int argc, char** argv, char** azColName, model::ArticleList* ptrArticles) -> int { 
 			return SelectAllAritcle(argc, argv, azColName, ptrArticles);

@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "ProgressDefine.h"
+
 namespace observer
 {
 
@@ -15,7 +17,7 @@ public:
 	ProgressSubject();
 	virtual ~ProgressSubject();
 
-	void Notify(int progress);
+	void Notify(ProgressComplete progress);
 	void Attach(ProgressObserver* observer);
 	void Detach(ProgressObserver* observer);
 

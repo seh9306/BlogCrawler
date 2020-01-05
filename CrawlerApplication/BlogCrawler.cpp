@@ -7,6 +7,7 @@
 #include "HttpClient.h"
 #include "HttpDefine.h"
 #include "HttpKeepAliveClient.h"
+#include "ProgressDefine.h"
 
 namespace crawler
 {
@@ -27,14 +28,14 @@ BlogCrawler::~BlogCrawler()
 
 bool BlogCrawler::Crawl()
 {
-	int notifyCount = 50;
-
 	auto pageSiteInfos = GetPageSiteInfos();
 
 	if (!GetAndInsertArticles(pageSiteInfos))
 	{
 		return false;
 	}
+
+	Notify(observer::kComplete);
 
 	return true;
 }

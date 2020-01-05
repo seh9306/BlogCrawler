@@ -14,7 +14,7 @@ ProgressSubject::~ProgressSubject()
 {
 }
 
-void ProgressSubject::Notify(int progress)
+void ProgressSubject::Notify(ProgressComplete progress)
 {
 	for (auto observer : observers_)
 	{

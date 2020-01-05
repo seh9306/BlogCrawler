@@ -42,7 +42,7 @@ public:
 	BlogCrawler();
 	virtual ~BlogCrawler();
 
-	bool Crawl() override;
+	virtual bool Crawl() override;
 	void SetDao(void* dao) override;
 
 protected:

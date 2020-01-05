@@ -10,11 +10,52 @@
 #include <thread>
 
 #include "BlogArticleDao.h"
+#include "ProgressDefine.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+namespace
+{
+
+static int GetWorkScore(observer::ProgressComplete progress)
+{
+	if (progress == observer::kComplete)
+	{
+		static int count = 0;
+		if (++count == 2)
+		{
+			return 100;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	static std::map<observer::ProgressComplete, int> progressScoreMap
+		= { 
+		{ observer::kCompleteDevMicrosoftBlogMakePageUrls           , 3 },
+		{ observer::kCompleteDevMicrosoftBlogParsePages             , 3 },
+		{ observer::kCompleteDevMicrosoftBlogRequestAndGetPages     , 3 },
+		{ observer::kCompleteDevMicrosoftBlogMakeArticleUrls        , 3 },
+		{ observer::kCompleteDevMicrosoftBlogParseArticles          , 3 },
+		{ observer::kCompleteDevMicrosoftBlogRequestAndGetArticles  , 3 },
+		{ observer::kCompleteDevMicrosoftBlogMappingArticles        , 1 },
+		{ observer::kCompleteDevMicrosoftBlogInsertArticles         , 1 },
+
+		{ observer::kCompleteHerbsutterBlogMakePageUrls             , 1 },
+		{ observer::kCompleteHerbsutterBlogParsePages               , 1 },
+		{ observer::kCompleteHerbsutterBlogReqeustAndGetPages       , 1 },
+		{ observer::kCompleteHerbsutterBlogMappingArticles          , 1 },
+		{ observer::kCompleteHerbsutterBlogInsertArticles           , 1 } 
+	};
+
+	return progressScoreMap.find(progress)->second;
+}
+
+}
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -216,9 +257,11 @@ void CCrawlerApplicationDlg::SetArticleBlogDao(std::shared_ptr<dao::BlogArticleD
 	blogArticleDao_ = blogArticleDao;
 }
 
-void CCrawlerApplicationDlg::Update(int progress)
+void CCrawlerApplicationDlg::Update(observer::ProgressComplete progress)
 {
-	progressCtrl_.SetPos(progress);
+	std::lock_guard<std::mutex> guard(progressMutex_);
+
+	progressCtrl_.SetPos(progressCtrl_.GetPos() + GetWorkScore(progress));
 }
 
 void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult)

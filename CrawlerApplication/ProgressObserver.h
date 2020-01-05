@@ -1,6 +1,8 @@
 #ifndef OBSERVER_OBSERVER_H
 #define OBSERVER_OBSERVER_H
 
+#include "ProgressDefine.h"
+
 namespace observer
 {
 
@@ -10,7 +12,7 @@ public:
 	ProgressObserver();
 	virtual ~ProgressObserver();
 
-	virtual void Update(int progress) = 0;
+	virtual void Update(ProgressComplete progress) = 0;
 };
 
 }

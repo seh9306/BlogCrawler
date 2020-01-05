@@ -6,6 +6,7 @@
 
 #include "Article.h"
 #include "BlogArticleDao.h"
+#include "ProgressDefine.h"
 
 namespace {
 
@@ -99,7 +100,11 @@ SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 				}
 			}
 
+			Notify(observer::kCompleteDevMicrosoftBlogMakeArticleUrls);
+
 			auto partSiteInfos = RequestAndGetDoc(articleUrls);
+
+			Notify(observer::kCompleteDevMicrosoftBlogParseArticles);
 
 			std::lock_guard<std::mutex> guard(mutex);
 			for (auto& siteInfo : partSiteInfos)
@@ -116,6 +121,8 @@ SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 	{
 		worker.join();
 	}
+
+	Notify(observer::kCompleteDevMicrosoftBlogRequestAndGetArticles);
 
 	return siteInfos;
 }
@@ -146,7 +153,11 @@ SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 				pageUrls.emplace_back(pageUrl);
 			}
 
+			Notify(observer::kCompleteDevMicrosoftBlogMakePageUrls);
+
 			auto partSiteInfos = RequestAndGetDoc(pageUrls);
+
+			Notify(observer::kCompleteDevMicrosoftBlogParsePages);
 
 			std::lock_guard<std::mutex> guard(mutex);
 			for (auto& siteInfo : partSiteInfos)
@@ -164,6 +175,8 @@ SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 		worker.join();
 	}
 	
+	Notify(observer::kCompleteDevMicrosoftBlogRequestAndGetPages);
+
  	return siteInfos;
 }
 
@@ -234,10 +247,14 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 		articles.emplace_back(titleNode.text(), articleInfo.first, imagePath, articleNode.text());
 	}
 
+	Notify(observer::kCompleteDevMicrosoftBlogMappingArticles);
+
 	if (!blogArticleDao_->InsertArticles(articles))
 	{
 		return false;
 	}
+
+	Notify(observer::kCompleteDevMicrosoftBlogInsertArticles);
 
 	return true;
 }
