@@ -7,31 +7,18 @@
 
 using boost::asio::ip::tcp;
 
-namespace
-{
-	constexpr char* const kHttpVersion = "HTTP/1.1";
-	constexpr char* const kDoctype = "<!DOCTYPE html>";
-
-	constexpr int kDoctypeSize = 15;
-}
-
 namespace util
 {
 
 class HttpClient
 {
 public:
-	enum StatusCode {
-		kFail = 0,
-
-		kResponseOK = 200,
-	};
-
 	HttpClient(boost::asio::io_context& io_context,
 		boost::asio::ssl::context& context,
 		const tcp::resolver::results_type& endpoints,
 		const char* host,
-		const char* path);
+		const char* path,
+		int responseFirstBufSize = 20000000);
 	~HttpClient();
 
 	const char* GetResponseBuf() const;

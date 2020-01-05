@@ -1,6 +1,8 @@
 #ifndef CRAWLER_CRAWLER_H
 #define CRAWLER_CRAWLER_H
 
+#include "ProgressSubject.h"
+
 namespace {
 	constexpr char* const kHttpsProtocolName = "https";
 }
@@ -9,6 +11,7 @@ namespace crawler
 {
 
 class Crawler
+	: public observer::ProgressSubject
 {
 public:
 	Crawler() {};

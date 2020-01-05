@@ -7,6 +7,7 @@
 #include "BlogArticleDao.h"
 #include "CrawlerApplication.h"
 #include "CrawlerApplicationDlg.h"
+#include "HttpKeepAliveClient.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -65,9 +66,13 @@ BOOL CCrawlerApplicationApp::InitInstance()
 
 	SetRegistryKey(_T("Crawler"));
 
-	Initialize();
-
 	CCrawlerApplicationDlg dlg;
+
+	observer::ObserverList observers;
+	observers.emplace_back(&dlg);
+
+	Initialize(observers);
+	
 	dlg.SetArticleBlogDao(blogArticleDao_);
 	m_pMainWnd = &dlg;
 
@@ -102,7 +107,7 @@ void CCrawlerApplicationApp::RunCrawlService() const
 	}
 }
 
-void CCrawlerApplicationApp::Initialize()
+void CCrawlerApplicationApp::Initialize(observer::ObserverList& observers)
 {
 	blogArticleDao_ = std::make_shared<dao::BlogArticleDao>();
 
@@ -113,6 +118,25 @@ void CCrawlerApplicationApp::Initialize()
 	for (auto& crawlService : crawlSerivces_)
 	{
 		crawlService->CreateCrawlers();
+		crawlService->SetProgressObserver(observers);
 		crawlService->SetDao(static_cast<void*>(&blogArticleDao_));
-	}
+	}/*
+
+	boost::asio::io_context ioContextToGetArticles;
+	tcp::resolver resolver(ioContextToGetArticles);
+	tcp::resolver::query query(u8"herbsutter.com", "https");
+	auto endpoints = resolver.resolve(query);
+	boost::asio::ssl::context ctx_(boost::asio::ssl::context::sslv23);
+	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
+	util::HttpKeepAliveClient c(ioContextToGetArticles, ctx_, endpoints);
+	c.Send(u8"herbsutter.com", u8"/page/2/");
+	c.Send(u8"herbsutter.com", u8"/page/3/");
+	c.Send(u8"herbsutter.com", u8"/page/4/");
+	c.Send(u8"herbsutter.com", u8"/page/5/");
+	c.Close(u8"herbsutter.com", u8"/page/6/");
+	ioContextToGetArticles.run();
+
+	auto buf = c.GetHtmlBodyInfos();
+	auto size = c.GetResponseSize();*/
+
 }

@@ -20,6 +20,8 @@ constexpr char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
 constexpr char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
 constexpr char* const kSelectorForTitle = u8"#featured > div > h1";
 
+constexpr int workerNum = 6;
+
 }
 
 namespace crawler
@@ -29,6 +31,7 @@ namespace blog
 {
 
 DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler()
+	: lastPageNumber_(0)
 {
 }
 
@@ -63,49 +66,122 @@ const char* const DevMicrosoftBlogCrawler::GetAttributeNameForUrl() const
 
 SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 {
-	UrlList articleUrls;
-	for (auto& pageInfo : pageInfos)
+	SiteInfo siteInfos;
+	std::mutex mutex;
+	std::vector<std::thread> workers;
+	workers.reserve(workerNum);
+	auto quotaPage = pageInfos.size() / workerNum;
+
+	for (int i = 0; i < workerNum; ++i)
 	{
-		auto& pageDoc = pageInfo.second;
-		auto articlesSelector = pageDoc->find(kSelectorForArticleUrlTag);
-		auto articleNum = articlesSelector.nodeNum();
+		std::thread worker([&](int id) {
+			UrlList articleUrls;
+			auto start = id * quotaPage + 1;
+			auto end = id + 1 == workerNum ? pageInfos.size() : (id + 1) * quotaPage + 1;
 
-		for (int i = 0; i < articleNum; ++i)
-		{
-			auto& articleDoc = articlesSelector.nodeAt(i);
-			auto urlTagSelector = articleDoc.find(kSelectorForArticleUrlTag);
-			auto urlTag = urlTagSelector.nodeAt(0);
+			for (; start < end; ++start)
+			{
+				auto& pageDoc = pageInfos.at(start).second;
+				auto articlesSelector = pageDoc->find(kSelectorForArticleUrlTag);
+				auto articleNum = articlesSelector.nodeNum();
 
-			articleUrls.emplace_back(urlTag.attribute(kUrlAttribute));
-		}
+				for (int i = 0; i < articleNum; ++i)
+				{
+					auto& articleDoc = articlesSelector.nodeAt(i);
+					auto urlTagSelector = articleDoc.find(kSelectorForArticleUrlTag);
+					if (urlTagSelector.nodeNum() == 0)
+					{
+						continue;
+					}
+					auto urlTag = urlTagSelector.nodeAt(0);
+
+					articleUrls.emplace_back(urlTag.attribute(kUrlAttribute));
+				}
+			}
+
+			auto partSiteInfos = RequestAndGetDoc(articleUrls);
+
+			std::lock_guard<std::mutex> guard(mutex);
+			for (auto& siteInfo : partSiteInfos)
+			{
+				siteInfos.emplace_back(std::move(siteInfo));
+			}
+
+		}, i);
+
+		workers.emplace_back(std::move(worker));
 	}
 
-	return RequestAndGetDoc(articleUrls);
+	for (auto& worker : workers)
+	{
+		worker.join();
+	}
+
+	return siteInfos;
 }
 
 SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 {
-	auto mainDoc = GetMainDocument();
+	int lastPageNumber = GetLastPageNumber();
+	
+	SiteInfo siteInfos;
+	std::mutex mutex;
+	std::vector<std::thread> workers;
+	workers.reserve(workerNum);
+	auto quotaPage = lastPageNumber / workerNum;
 
-	auto lastPageSelector = mainDoc->find(kSelectorForLastPageTag);
-	int lastPageNum = 0;
-	if (lastPageSelector.nodeNum() != 0)
+	for (int i = 0; i < workerNum; ++i)
 	{
-		auto lastPageTag = lastPageSelector.nodeAt(0);
-		lastPageNum = std::stoi(lastPageTag.text());
+		std::thread worker([&](int id) {
+			UrlList pageUrls;
+			auto start = id * quotaPage + 1;
+			auto end = (id + 1 == workerNum ? lastPageNumber : (id + 1) * quotaPage) + 1;
+
+			for (;start < end; ++start)
+			{
+				std::string pageUrl(kIndexPath);
+				pageUrl.append(kPagePath);
+				pageUrl.append(std::to_string(start));
+
+				pageUrls.emplace_back(pageUrl);
+			}
+
+			auto partSiteInfos = RequestAndGetDoc(pageUrls);
+
+			std::lock_guard<std::mutex> guard(mutex);
+			for (auto& siteInfo : partSiteInfos)
+			{
+				siteInfos.emplace_back(std::move(siteInfo));
+			}
+
+		}, i);
+
+		workers.emplace_back(std::move(worker));
 	}
 
-	UrlList pageUrls;
-	for (int i = 1; i < 2/*lastPageNum + 1*/; ++i)
+	for (auto& worker : workers)
 	{
-		std::string pageUrl(kIndexPath);
-		pageUrl.append(kPagePath);
-		pageUrl.append(std::to_string(i));
+		worker.join();
+	}
+	
+ 	return siteInfos;
+}
 
-		pageUrls.emplace_back(pageUrl);
+int DevMicrosoftBlogCrawler::GetLastPageNumber()
+{
+	if (lastPageNumber_ == 0)
+	{
+		auto mainDoc = GetMainDocument();
+
+		auto lastPageSelector = mainDoc->find(kSelectorForLastPageTag);
+		if (lastPageSelector.nodeNum() != 0)
+		{
+			auto lastPageTag = lastPageSelector.nodeAt(0);
+			lastPageNumber_ = std::stoi(lastPageTag.text());
+		}
 	}
 
-	return RequestAndGetDoc(pageUrls);
+	return lastPageNumber_;
 }
 
 bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
@@ -117,6 +193,10 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 	for (auto& articleInfo : articleSites)
 	{
 		auto& articleDoc = articleInfo.second;
+		if (articleDoc.get() == nullptr)
+		{
+			continue;
+		}
 		auto titleSelector = articleDoc->find(kSelectorForTitle);
 		if (titleSelector.nodeNum() == 0)
 		{
@@ -130,7 +210,16 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 			continue;
 		}
 
+		if (titleSelector.nodeNum() == 0)
+		{
+			continue;
+		}
 		auto titleNode = titleSelector.nodeAt(0);
+
+		if (articleSelector.nodeNum() == 0)
+		{
+			continue;
+		}
 		auto articleNode = articleSelector.nodeAt(0);
 
 		auto imgTagSelection = articleNode.find(kImgTagName);

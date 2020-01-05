@@ -93,11 +93,11 @@ bool BlogArticleDao::Initialize()
 	}
 
 	bool existTable = false;
-	Sqlite3Exec(CHECK_TABLE_QUERY, ArticleTableCheck, static_cast<void*>(&existTable));
+	Sqlite3Exec(query::CHECK_TABLE_QUERY, ArticleTableCheck, static_cast<void*>(&existTable));
 
 	if (!existTable)
 	{
-		if (Sqlite3Exec(CREATE_ARTICLE_TABLE_QUERY) != kSqliteOK)
+		if (Sqlite3Exec(query::CREATE_ARTICLE_TABLE_QUERY) != kSqliteOK)
 		{
 			return false;
 		}
@@ -117,10 +117,10 @@ bool BlogArticleDao::InsertArticles(model::ArticleList& articles)
 {
 	sqlite3_stmt* pStmt = NULL;
 
-	std::string query(BEGIN_TRANSACTION);
+	std::string query(query::BEGIN_TRANSACTION);
 
 	for(model::Article& article : articles) {
-		sqlite3_prepare_v2(db_, INSERT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
+		int result = sqlite3_prepare_v2(db_, query::INSERT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
 		sqlite3_bind_text(pStmt, kTitle, article.title_.c_str(), article.title_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kUrl, article.url_.c_str(), article.url_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kImagePath, article.imagePath_.c_str(), article.imagePath_.size(), SQLITE_STATIC);
@@ -130,7 +130,7 @@ bool BlogArticleDao::InsertArticles(model::ArticleList& articles)
 
 		sqlite3_finalize(pStmt);
 	};
-	query.append(COMMIT);
+	query.append(query::COMMIT);
 
 	return Sqlite3Exec(query.c_str()) == kSqliteOK;
 }
@@ -139,7 +139,7 @@ model::ArticleList BlogArticleDao::SelectArticles()
 {
 	model::ArticleList articles;
 
-	Sqlite3Exec(SELECT_ALL_ARTICLES_QUERY, kSelectAllAritcle, articles);
+	Sqlite3Exec(query::SELECT_ALL_ARTICLES_QUERY, kSelectAllAritcle, articles);
 
 	return articles;
 }
@@ -148,10 +148,9 @@ model::ArticleList BlogArticleDao::SelectArticles(std::string search)
 {
 	sqlite3_stmt* pStmt = NULL;
 
-
-	std::string query(SELECT_LIKE_ARTICLES_QUERY_START);
+	std::string query(query::SELECT_LIKE_ARTICLES_QUERY_START);
 	query.append(search);
-	query.append(SELECT_LIKE_ARTICLES_QUERY_END);
+	query.append(query::SELECT_LIKE_ARTICLES_QUERY_END);
 
 	model::ArticleList articles;
 	Sqlite3Exec(query.c_str(), kSelectAllAritcle, articles);
@@ -172,7 +171,7 @@ int BlogArticleDao::SelectAllAritcle(int argc, char** argv, char** azColName, mo
 	{
 		return kBadAction;
 	}
-	ptrArticles->emplace_back(argv[kTitle], argv[kUrl], argv[kImagePath], argv[kContent]);
+	ptrArticles->emplace_back(std::stoi(argv[kId]), argv[kTitle], argv[kUrl], argv[kImagePath], argv[kContent]);
 
 	return kSqliteOK;
 }

@@ -18,6 +18,7 @@ public:
 	void Execute() const;
 
 	virtual void CreateCrawlers() = 0;
+	virtual void SetProgressObserver(observer::ObserverList& observers) = 0;
 	virtual void SetDao(void* dao) = 0;
 
 protected:

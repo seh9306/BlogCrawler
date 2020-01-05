@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CCrawlerApplicationDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CCrawlerApplicationDlg::OnBnClickedCrawlingButton)
 	ON_BN_CLICKED(IDC_BUTTON2, &CCrawlerApplicationDlg::OnClickedSearchButton)
 	ON_NOTIFY(LVN_GETDISPINFO, IDC_LIST1, &CCrawlerApplicationDlg::OnGetdispinfoArticleList)
+	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CCrawlerApplicationDlg::OnArticleItemClickList)
 END_MESSAGE_MAP()
 
 
@@ -105,13 +106,19 @@ BOOL CCrawlerApplicationDlg::OnInitDialog()
 		}
 	}
 
+	CRect rect;
+	searchList_.GetWindowRect(rect);
+	searchList_.InsertColumn(0, TEXT("thumnail"), LVCFMT_LEFT, rect.Width()*0.4);
+	searchList_.InsertColumn(1, TEXT("title"), LVCFMT_LEFT, rect.Width()*0.3);
+	searchList_.InsertColumn(2, TEXT("url"), LVCFMT_LEFT, rect.Width()*0.3);
+
+	searchList_.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+	progressCtrl_.SetRange(0, 100);
 	// 이 대화 상자의 아이콘을 설정합니다.  응용 프로그램의 주 창이 대화 상자가 아닐 경우에는
 	//  프레임워크가 이 작업을 자동으로 수행합니다.
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
-
-	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -174,7 +181,7 @@ void CCrawlerApplicationDlg::OnBnClickedCrawlingButton()
 		{
 			app->RunCrawlService();
 		}
-
+		progressCtrl_.SetPos(100);
 	}).detach();
 }
 
@@ -186,10 +193,20 @@ void CCrawlerApplicationDlg::OnClickedSearchButton()
 		searchEdit_.GetWindowTextW(searchCstring);
 
 		std::string search = converter_.to_bytes(searchCstring.GetBuffer());
-
 		articles_ = std::move(blogArticleDao_->SelectArticles(search));
+		imageList_.Detach();
+		imageList_.Create(300, 300, ILC_COLOR32, 0, 1000);
+
+		CImage image;
+		image.Load(_T("C:\\Users\\Park\\Desktop\\dev\\Crawler\\x64\\Debug\\red.png")); 
+		CBitmap bitmap;
+		bitmap.Attach(image.Detach());
+
+		imageList_.Add(&bitmap, ILC_COLOR32);
+
+		searchList_.SetImageList(&imageList_, LVSIL_SMALL);
+		searchList_.SetItemCountEx(static_cast<int>(articles_.size()), LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
 		
-		searchList_.SetItemCountEx(articles_.size());
 		searchButton_.EnableWindow(TRUE);
 	}).detach();
 }
@@ -199,6 +216,10 @@ void CCrawlerApplicationDlg::SetArticleBlogDao(std::shared_ptr<dao::BlogArticleD
 	blogArticleDao_ = blogArticleDao;
 }
 
+void CCrawlerApplicationDlg::Update(int progress)
+{
+	progressCtrl_.SetPos(progress);
+}
 
 void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -215,22 +236,47 @@ void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pR
 		return;
 	}
 
-	auto article = articles_.at(nRow);
-	auto content = converter_.from_bytes(article.content_);
-
-	if (pItem->pszText) //이값이 널로 올 때도 당연히 있음.
+	auto& article = articles_.at(nRow);
+	
+	if (pItem->pszText)
 	{
+		std::wstring content;
 		switch (nCol)
 		{
 		case 0:
-			lstrcpy(pItem->pszText, content.c_str()/*nRow, 0번 열에 들어갈 문자열*/);
 			break;
 		case 1:
-			lstrcpy(pItem->pszText, L""/*nRow, 1번 열에 들어갈 문자열*/);
+			content = converter_.from_bytes(article.title_);
+			std::wcsncpy(pItem->pszText, content.c_str(), content.size() + 1);
+			break;
+		case 2:
+			content = converter_.from_bytes(article.url_);
+			std::wcsncpy(pItem->pszText, content.c_str(), content.size() + 1);
 			break;
 		}
-
 	}
+
+	if (pItem->mask & LVIF_IMAGE)
+	{
+		pItem->iImage = 0;
+	}
+
+	*pResult = 0;
+}
+
+void CCrawlerApplicationDlg::OnArticleItemClickList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	if (pNMItemActivate->iItem < 0 || pNMItemActivate->iItem > articles_.size())
+	{
+		return;
+	}
+
+	auto article = articles_.at(pNMItemActivate->iItem);
+	auto url = converter_.from_bytes(article.url_);
+	
+	ShellExecute(NULL, L"open", url.c_str(), L"", L"", SW_SHOW);
 
 	*pResult = 0;
 }

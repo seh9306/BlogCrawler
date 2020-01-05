@@ -14,6 +14,7 @@ public:
 	~BlogCrawlService();
 	
 	void CreateCrawlers() override;
+	void SetProgressObserver(observer::ObserverList& observers) override;
 	void SetDao(void* dao) override;
 };
 
