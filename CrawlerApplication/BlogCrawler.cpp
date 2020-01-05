@@ -111,17 +111,9 @@ SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 	ioContextToGetArticles.run();
 
 	std::string stringForResponse;
-	httpKeepAliveClient.GetResponseLine(urls, stringForResponse);
+	httpKeepAliveClient.GetResponseLine(stringForResponse);
 
-	
-	/**/
-
-	return GetHtmlBody(stringForResponse);
-}
-
-SiteInfo BlogCrawler::GetHtmlBody(UrlList& urls, std::string stringForResponse)
-{
-	auto buffer = stringForResponse.c_str();
+	auto htmlBodyInfos = GetHtmlBody(urls, stringForResponse);
 
 	SiteInfo siteInfo;
 	int i = 0;
@@ -139,7 +131,58 @@ SiteInfo BlogCrawler::GetHtmlBody(UrlList& urls, std::string stringForResponse)
 		auto remainSiteInfo = RequestAndGetDoc(urls);
 	}
 
-	return SiteInfo();
+	return siteInfo;
+}
+
+util::HtmlBodyInfoList BlogCrawler::GetHtmlBody(UrlList& urls, std::string& stringForResponse)
+{
+	auto buffer = stringForResponse.c_str();
+	auto offset = const_cast<char*>(buffer);
+	auto end = buffer + stringForResponse.size();
+
+	util::HtmlBodyInfoList htmlBodyInfos;
+
+	while (end > offset + 8)
+	{
+		if (std::strncmp("HTTP/1.1", offset, 8) == 0)
+		{
+			offset += 9;
+			if (std::strncmp("200", offset, 3) == 0)
+			{
+				while (end > offset + 5
+					&& std::strncmp("<body", offset, 5))
+				{
+					++offset;
+				}
+
+				if (end <= offset + 5)
+				{
+					break;
+				}
+
+				util::HtmlBodyInfo htmlBodyInfo;
+				htmlBodyInfo.body_ = offset;
+
+				while (end > offset + 7
+					&& std::strncmp("</body>", offset, 7))
+				{
+					++offset;
+				}
+
+				if (end <= offset + 7)
+				{
+					break;
+				}
+
+				*(offset + 7) = NULL;
+
+				htmlBodyInfos.push_back(htmlBodyInfo);
+			}
+		}
+		++offset;
+	}
+
+	return htmlBodyInfos;
 }
 
 std::unique_ptr<HtmlDocument> BlogCrawler::GetMainDocument()

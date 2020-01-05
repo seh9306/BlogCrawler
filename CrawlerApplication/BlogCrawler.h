@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Crawler.h"
+#include "HttpKeepAliveClient.h"
 
 namespace dao
 {
@@ -57,7 +58,7 @@ protected:
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 
 private:
-	SiteInfo GetHtmlBody(UrlList& urls, std::string stringForResponse);
+	util::HtmlBodyInfoList GetHtmlBody(UrlList& urls, std::string& stringForResponse);
 
 	// template method
 	virtual void CatchExceptionalUrlCase(std::string& url) = 0;
