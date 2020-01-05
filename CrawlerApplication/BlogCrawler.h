@@ -52,8 +52,6 @@ protected:
 	Site RequestAndGetDoc(std::string path);
 	SiteInfo RequestAndGetDoc(UrlList& urls);
 
-	int pageIndex_;
-	int requestPageNumberDegree_;
 	boost::asio::ssl::context ctx_;
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 
@@ -61,7 +59,6 @@ private:
 	util::HtmlBodyInfoList GetHtmlBody(UrlList& urls, std::string& stringForResponse);
 
 	// template method
-	virtual void CatchExceptionalUrlCase(std::string& url) = 0;
 	virtual bool GetAndInsertArticles(SiteInfo& HtmlDocuments) = 0;
 
 	virtual const char* const GetHost() const = 0;

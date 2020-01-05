@@ -17,7 +17,6 @@ public:
 	virtual ~HerbsutterBlogCrawler();
 
 private:
-	void CatchExceptionalUrlCase(std::string& url) override;
 	bool GetAndInsertArticles(SiteInfo& HtmlDocuments) override;
 
 	const char* const GetHost() const override;

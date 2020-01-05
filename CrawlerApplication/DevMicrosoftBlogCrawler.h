@@ -20,7 +20,6 @@ private:
 	SiteInfo GetArticleSiteInfos(SiteInfo& pageInfos);
 	int GetLastPageNumber();
 
-	void CatchExceptionalUrlCase(std::string& url) override;
 	bool GetAndInsertArticles(SiteInfo& articleSites) override;
 
 	const char* const GetHost() const override;

@@ -64,34 +64,45 @@ const char* const HerbsutterBlogCrawler::GetAttributeNameForUrl() const
 
 SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 {
-	SiteInfo pageInfo;
+	UrlList urls;
 
-	if (pageIndex_ == 1)
+	int pageIndex = 1;
+
+	SiteInfo pageInfos;
+
+	while (true)
 	{
-		pageInfo.emplace_back(kIndexPath, GetMainDocument());
-	}
-	
-	int nowPageIndex = pageIndex_;
-	while(nowPageIndex < pageIndex_ + requestPageNumberDegree_)
-	{
-		std::string path(kIndexPath);
-		path.append(kPagePath);
-		path.append(std::to_string(++nowPageIndex));
-		path.append("/");
+		urls.clear();
+		if (pageIndex == 1)
+		{
+			urls.emplace_back(kIndexPath);
+		}
 
-		auto site = RequestAndGetDoc(path);
+		for (int i = 0; i < 10; ++i)
+		{
+			std::string path(kIndexPath);
+			path.append(kPagePath);
+			path.append(std::to_string(++pageIndex));
+			path.append(u8"/");
 
-		if (site.second.get() == nullptr)
+			urls.emplace_back(path);
+		}
+		
+		auto partSiteInfos = RequestAndGetDoc(urls);
+
+		for (auto& siteInfo : partSiteInfos)
+		{
+			pageInfos.emplace_back(std::move(siteInfo.first), std::move(siteInfo.second));
+		}
+		
+		if (partSiteInfos.size() < 10)
 		{
 			break;
 		}
-
-		pageInfo.emplace_back( site.first, std::move(site.second));
+	
 	}
-
-	pageIndex_ = nowPageIndex;
-
-	return pageInfo;
+	
+	return pageInfos;
 }
 
 bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
@@ -127,7 +138,7 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 
 			if (contentTagSelection.nodeNum() == 0) 
 			{
-				article.content_ = "잘못된 값";
+				article.content_ = u8"empty";
 			}
 			else 
 			{
@@ -153,11 +164,6 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& HtmlDocuments)
 	}
 
 	return true;
-}
-
-void HerbsutterBlogCrawler::CatchExceptionalUrlCase(std::string& url)
-{
-	/* Do nothing in this class */
 }
 
 }

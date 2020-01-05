@@ -3,10 +3,6 @@
 
 #include "ProgressSubject.h"
 
-namespace {
-	constexpr char* const kHttpsProtocolName = "https";
-}
-
 namespace crawler
 {
 

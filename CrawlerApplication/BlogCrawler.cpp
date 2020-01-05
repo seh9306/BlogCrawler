@@ -8,12 +8,6 @@
 #include "HttpDefine.h"
 #include "HttpKeepAliveClient.h"
 
-namespace {
-
-constexpr int kRequestPageNumberDegree = 5;
-
-}
-
 namespace crawler
 {
 
@@ -21,9 +15,7 @@ namespace blog
 {
 
 BlogCrawler::BlogCrawler()
-	: pageIndex_(1),
-	requestPageNumberDegree_(kRequestPageNumberDegree),
-	ctx_(boost::asio::ssl::context::sslv23),
+	: ctx_(boost::asio::ssl::context::sslv23),
 	blogArticleDao_(nullptr)
 {
 	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
@@ -35,7 +27,6 @@ BlogCrawler::~BlogCrawler()
 
 bool BlogCrawler::Crawl()
 {
-	pageIndex_ = 1;
 	int notifyCount = 50;
 
 	auto pageSiteInfos = GetPageSiteInfos();
@@ -44,8 +35,6 @@ bool BlogCrawler::Crawl()
 	{
 		return false;
 	}
-
-	Notify(pageIndex_);
 
 	return true;
 }
@@ -64,7 +53,7 @@ Site BlogCrawler::RequestAndGetDoc(std::string path)
 {
 	boost::asio::io_context ioContextToGetArticles;
 	tcp::resolver resolver(ioContextToGetArticles);
-	tcp::resolver::query query(GetHost(), "https");
+	tcp::resolver::query query(GetHost(), util::kHttps);
 	auto endpoints = resolver.resolve(query);
 
 	auto httpClient = std::make_unique<util::HttpClient>(ioContextToGetArticles, ctx_, endpoints, GetHost(), path.c_str());
@@ -92,7 +81,7 @@ SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 {
 	boost::asio::io_context ioContextToGetArticles;
 	tcp::resolver resolver(ioContextToGetArticles);
-	tcp::resolver::query query(GetHost(), "https");
+	tcp::resolver::query query(GetHost(), util::kHttps);
 	auto endpoints = resolver.resolve(query);
 
 	util::HttpKeepAliveClient httpKeepAliveClient(ioContextToGetArticles, ctx_, endpoints);
@@ -119,7 +108,8 @@ SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 		siteInfo.emplace_back(urls.at(i), std::move(htmlDocument));
 	}
 
-	if (i != urls.size())
+	if (i != urls.size()
+		&& htmlBodyInfos.size() != 0)
 	{
 		auto& url = urls.at(i);
 		if (url.empty())
@@ -144,13 +134,13 @@ util::HtmlBodyInfoList BlogCrawler::GetHtmlBody(UrlList& urls, std::string& stri
 
 	while (end > offset + 8)
 	{
-		if (std::strncmp("HTTP/1.1", offset, 8) == 0)
+		if (std::strncmp(util::kHttpVersion, offset, 8) == 0)
 		{
 			offset += 9;
-			if (std::strncmp("200", offset, 3) == 0)
+			if (std::strncmp(util::kResponseOKStringNumber, offset, 3) == 0)
 			{
 				while (end > offset + 5
-					&& std::strncmp("<body", offset, 5))
+					&& std::strncmp(util::kOpenBodyTag, offset, 5))
 				{
 					++offset;
 				}
@@ -164,7 +154,7 @@ util::HtmlBodyInfoList BlogCrawler::GetHtmlBody(UrlList& urls, std::string& stri
 				htmlBodyInfo.body_ = offset;
 
 				while (end > offset + 7
-					&& std::strncmp("</body>", offset, 7))
+					&& std::strncmp(util::kCloseBodyTag, offset, 7))
 				{
 					++offset;
 				}

@@ -242,15 +242,6 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 	return true;
 }
 
-void DevMicrosoftBlogCrawler::CatchExceptionalUrlCase(std::string& url)
-{
-	auto index = url.find("http");
-	if (index != 0)
-	{
-		url.erase(url.begin(), url.begin() + index);
-	}
-}
-
 }
 
 }

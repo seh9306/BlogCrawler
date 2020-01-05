@@ -18,7 +18,7 @@ BlogCrawlService::~BlogCrawlService()
 
 void BlogCrawlService::CreateCrawlers()
 {
-	//crawlers.push_back(std::make_unique<crawler::blog::HerbsutterBlogCrawler>());
+	crawlers.push_back(std::make_unique<crawler::blog::HerbsutterBlogCrawler>());
 	crawlers.push_back(std::make_unique<crawler::blog::DevMicrosoftBlogCrawler>());
 }
 
