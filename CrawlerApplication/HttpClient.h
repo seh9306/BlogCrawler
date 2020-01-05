@@ -13,12 +13,6 @@ namespace util
 class HttpClient
 {
 public:
-	enum StatusCode {
-		kFail = 0,
-
-		kResponseOK = 200,
-	};
-
 	HttpClient(boost::asio::io_context& io_context,
 		boost::asio::ssl::context& context,
 		const tcp::resolver::results_type& endpoints,

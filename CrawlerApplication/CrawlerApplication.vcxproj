@@ -212,6 +212,7 @@
     <ClInclude Include="DevMicrosoftBlogCrawler.h" />
     <ClInclude Include="HerbsutterBlogCrawler.h" />
     <ClInclude Include="HttpClient.h" />
+    <ClInclude Include="HttpDefine.h" />
     <ClInclude Include="HttpKeepAliveClient.h" />
     <ClInclude Include="ProgressObserver.h" />
     <ClInclude Include="Resource.h" />

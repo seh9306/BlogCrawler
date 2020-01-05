@@ -23,19 +23,13 @@ using HtmlBodyInfoList = std::vector<HtmlBodyInfo>;
 class HttpKeepAliveClient
 {
 public:
-	enum StatusCode {
-		kFail = 0,
-
-		kResponseOK = 200,
-	};
-
 	HttpKeepAliveClient(boost::asio::io_context& io_context,
 		boost::asio::ssl::context& context,
-		const tcp::resolver::results_type& endpoints);
+		const tcp::resolver::results_type& endpoints,
+		int responseFirstBufSize = 80000000);
 	~HttpKeepAliveClient();
 
 	void Send(const char* host, const char* path);
-	void Close(const char* host, const char* path);
 
 	HtmlBodyInfoList GetHtmlBodyInfos() const;
 	

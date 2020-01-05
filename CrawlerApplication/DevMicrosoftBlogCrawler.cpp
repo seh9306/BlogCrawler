@@ -20,6 +20,8 @@ constexpr char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
 constexpr char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
 constexpr char* const kSelectorForTitle = u8"#featured > div > h1";
 
+constexpr int workerNum = 6;
+
 }
 
 namespace crawler
@@ -64,61 +66,105 @@ const char* const DevMicrosoftBlogCrawler::GetAttributeNameForUrl() const
 
 SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 {
-	UrlList articleUrls;
-	for (auto& pageInfo : pageInfos)
+	SiteInfo siteInfos;
+	std::mutex mutex;
+	std::vector<std::thread> workers;
+	workers.reserve(workerNum);
+	auto quotaPage = pageInfos.size() / workerNum;
+
+	for (int i = 0; i < workerNum; ++i)
 	{
-		auto& pageDoc = pageInfo.second;
-		auto articlesSelector = pageDoc->find(kSelectorForArticleUrlTag);
-		auto articleNum = articlesSelector.nodeNum();
+		std::thread worker([&](int id) {
+			UrlList articleUrls;
+			auto start = id * quotaPage + 1;
+			auto end = id + 1 == workerNum ? pageInfos.size() : (id + 1) * quotaPage + 1;
 
-		for (int i = 0; i < articleNum; ++i)
-		{
-			auto& articleDoc = articlesSelector.nodeAt(i);
-			auto urlTagSelector = articleDoc.find(kSelectorForArticleUrlTag);
-			if (urlTagSelector.nodeNum() == 0)
+			for (; start < end; ++start)
 			{
-				continue;
-			}
-			auto urlTag = urlTagSelector.nodeAt(0);
+				auto& pageDoc = pageInfos.at(start).second;
+				auto articlesSelector = pageDoc->find(kSelectorForArticleUrlTag);
+				auto articleNum = articlesSelector.nodeNum();
 
-			articleUrls.emplace_back(urlTag.attribute(kUrlAttribute));
-		}
+				for (int i = 0; i < articleNum; ++i)
+				{
+					auto& articleDoc = articlesSelector.nodeAt(i);
+					auto urlTagSelector = articleDoc.find(kSelectorForArticleUrlTag);
+					if (urlTagSelector.nodeNum() == 0)
+					{
+						continue;
+					}
+					auto urlTag = urlTagSelector.nodeAt(0);
+
+					articleUrls.emplace_back(urlTag.attribute(kUrlAttribute));
+				}
+			}
+
+			auto partSiteInfos = RequestAndGetDoc(articleUrls);
+
+			std::lock_guard<std::mutex> guard(mutex);
+			for (auto& siteInfo : partSiteInfos)
+			{
+				siteInfos.emplace_back(std::move(siteInfo));
+			}
+
+		}, i);
+
+		workers.emplace_back(std::move(worker));
 	}
 
-	/*SiteInfo siteInfo;
-
-	for (auto articleUrl : articleUrls)
+	for (auto& worker : workers)
 	{
-		auto site = RequestAndGetDoc(articleUrl);
-		siteInfo.emplace_back(site.first, std::move(site.second));
-	}*/
+		worker.join();
+	}
 
-	return RequestAndGetDoc(articleUrls);
+	return siteInfos;
 }
 
 SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 {
 	int lastPageNumber = GetLastPageNumber();
-	int goalPageNumber = pageIndex_ + requestPageNumberDegree_;
+	
+	SiteInfo siteInfos;
+	std::mutex mutex;
+	std::vector<std::thread> workers;
+	workers.reserve(workerNum);
+	auto quotaPage = lastPageNumber / workerNum;
 
-	if (lastPageNumber + 1 < goalPageNumber)
+	for (int i = 0; i < workerNum; ++i)
 	{
-		goalPageNumber = lastPageNumber;
+		std::thread worker([&](int id) {
+			UrlList pageUrls;
+			auto start = id * quotaPage + 1;
+			auto end = (id + 1 == workerNum ? lastPageNumber : (id + 1) * quotaPage) + 1;
+
+			for (;start < end; ++start)
+			{
+				std::string pageUrl(kIndexPath);
+				pageUrl.append(kPagePath);
+				pageUrl.append(std::to_string(start));
+
+				pageUrls.emplace_back(pageUrl);
+			}
+
+			auto partSiteInfos = RequestAndGetDoc(pageUrls);
+
+			std::lock_guard<std::mutex> guard(mutex);
+			for (auto& siteInfo : partSiteInfos)
+			{
+				siteInfos.emplace_back(std::move(siteInfo));
+			}
+
+		}, i);
+
+		workers.emplace_back(std::move(worker));
 	}
 
-	UrlList pageUrls;
-	for (int i = pageIndex_; i < goalPageNumber; ++i)
+	for (auto& worker : workers)
 	{
-		std::string pageUrl(kIndexPath);
-		pageUrl.append(kPagePath);
-		pageUrl.append(std::to_string(i));
-
-		pageUrls.emplace_back(pageUrl);
+		worker.join();
 	}
-
-	pageIndex_ = goalPageNumber;
-
-	return RequestAndGetDoc(pageUrls);
+	
+ 	return siteInfos;
 }
 
 int DevMicrosoftBlogCrawler::GetLastPageNumber()

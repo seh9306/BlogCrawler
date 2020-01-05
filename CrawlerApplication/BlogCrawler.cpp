@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "BlogCrawler.h"
+
 #include <Node.h>
 
 #include "BlogArticleDao.h"
 #include "HttpClient.h"
+#include "HttpDefine.h"
 #include "HttpKeepAliveClient.h"
 
 namespace {
@@ -36,22 +38,14 @@ bool BlogCrawler::Crawl()
 	pageIndex_ = 1;
 	int notifyCount = 50;
 
-	while (true)
+	auto pageSiteInfos = GetPageSiteInfos();
+
+	if (!GetAndInsertArticles(pageSiteInfos))
 	{
-		auto pageSiteInfos = GetPageSiteInfos();
-
-		/*if (pageSiteInfos.size() < requestPageNumberDegree_)
-		{
-			break;
-		}*/
-
-		if (!GetAndInsertArticles(pageSiteInfos))
-		{
-			return false;
-		}
-
-		Notify(pageIndex_);
+		return false;
 	}
+
+	Notify(pageIndex_);
 
 	return true;
 }
@@ -78,7 +72,7 @@ Site BlogCrawler::RequestAndGetDoc(std::string path)
 	ioContextToGetArticles.run();
 
 	auto statusCode = httpClient->GetStatusCode();
-	if (statusCode != util::HttpClient::kResponseOK)
+	if (statusCode != util::StatusCode::kResponseOK)
 	{
 		return { path, nullptr };
 	}
@@ -127,7 +121,13 @@ SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 
 	if (i != urls.size())
 	{
+		auto& url = urls.at(i);
+		if (url.empty())
+		{
+			++i;
+		}
 		urls.erase(urls.begin(), urls.begin() + i);
+
 		auto remainSiteInfo = RequestAndGetDoc(urls);
 	}
 
@@ -182,29 +182,19 @@ util::HtmlBodyInfoList BlogCrawler::GetHtmlBody(UrlList& urls, std::string& stri
 		++offset;
 	}
 
+	auto size = htmlBodyInfos.size();
+
 	return htmlBodyInfos;
 }
 
 std::unique_ptr<HtmlDocument> BlogCrawler::GetMainDocument()
 {
-	auto host = GetHost();
+	UrlList urlList;
+	
+	urlList.emplace_back(GetIndexPath());
+	auto siteInfo = RequestAndGetDoc(urlList);
 
-	boost::asio::io_context ioContext;
-	tcp::resolver resolver(ioContext);
-	tcp::resolver::query query(host, "https");
-	auto endpoints = resolver.resolve(query);
-
-	util::HttpClient httpClient(ioContext, ctx_, endpoints, host, GetIndexPath());
-	ioContext.run();
-
-	auto buf = httpClient.GetResponseBuf();
-	size_t size = httpClient.GetResponseSize();
-
-	std::string page(buf, size);
-	auto htmlDocument = std::make_unique<HtmlDocument>();
-	htmlDocument->parse(page);
-
-	return htmlDocument;
+	return std::move(siteInfo.at(0).second);
 }
 
 }

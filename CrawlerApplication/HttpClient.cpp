@@ -3,15 +3,7 @@
 
 #include <boost/bind.hpp>
 
-namespace
-{
-
-constexpr char* const kHttpVersion = "HTTP/1.1";
-constexpr char* const kDoctype = "<!DOCTYPE html>";
-
-constexpr int kDoctypeSize = 15;
-
-}
+#include "HttpDefine.h"
 
 namespace util
 {
