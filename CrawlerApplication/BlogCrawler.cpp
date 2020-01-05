@@ -4,6 +4,13 @@
 
 #include "BlogArticleDao.h"
 #include "HttpClient.h"
+#include "HttpKeepAliveClient.h"
+
+namespace {
+
+constexpr int kRequestPageNumberDegree = 5;
+
+}
 
 namespace crawler
 {
@@ -13,7 +20,7 @@ namespace blog
 
 BlogCrawler::BlogCrawler()
 	: pageIndex_(1),
-	requestPageNumberDegree_(10),
+	requestPageNumberDegree_(kRequestPageNumberDegree),
 	ctx_(boost::asio::ssl::context::sslv23),
 	blogArticleDao_(nullptr)
 {
@@ -33,10 +40,10 @@ bool BlogCrawler::Crawl()
 	{
 		auto pageSiteInfos = GetPageSiteInfos();
 
-		if (pageSiteInfos.size() < requestPageNumberDegree_)
+		/*if (pageSiteInfos.size() < requestPageNumberDegree_)
 		{
 			break;
-		}
+		}*/
 
 		if (!GetAndInsertArticles(pageSiteInfos))
 		{
@@ -89,43 +96,50 @@ Site BlogCrawler::RequestAndGetDoc(std::string path)
 
 SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 {
-	auto urlSize = urls.size();
+	boost::asio::io_context ioContextToGetArticles;
+	tcp::resolver resolver(ioContextToGetArticles);
+	tcp::resolver::query query(GetHost(), "https");
+	auto endpoints = resolver.resolve(query);
 
-	std::vector<std::unique_ptr<util::HttpClient>> httpClients;
-	httpClients.reserve(urlSize);
+	util::HttpKeepAliveClient httpKeepAliveClient(ioContextToGetArticles, ctx_, endpoints);
 
-	for (auto i = 0; i < urlSize; ++i)
+	for (auto url : urls)
 	{
-		boost::asio::io_context ioContextToGetArticles;
-		tcp::resolver resolver(ioContextToGetArticles);
-		tcp::resolver::query query(GetHost(), "https");
-		auto endpoints = resolver.resolve(query);
+		httpKeepAliveClient.Send(GetHost(), url.c_str());
+	}
+	
+	ioContextToGetArticles.run();
 
-		auto path = urls.at(i).c_str();
+	std::string stringForResponse;
+	httpKeepAliveClient.GetResponseLine(urls, stringForResponse);
 
-		httpClients.emplace_back(
-			std::make_unique<util::HttpClient>(ioContextToGetArticles, ctx_, endpoints, GetHost(), path)
-		);
+	
+	/**/
 
-		ioContextToGetArticles.run();
+	return GetHtmlBody(stringForResponse);
+}
+
+SiteInfo BlogCrawler::GetHtmlBody(UrlList& urls, std::string stringForResponse)
+{
+	auto buffer = stringForResponse.c_str();
+
+	SiteInfo siteInfo;
+	int i = 0;
+	for (; i < htmlBodyInfos.size(); ++i)
+	{
+		auto htmlBodyInfo = htmlBodyInfos.at(i);
+		auto htmlDocument = std::make_unique<HtmlDocument>();;
+		htmlDocument->parse(htmlBodyInfo.body_);
+		siteInfo.emplace_back(urls.at(i), std::move(htmlDocument));
 	}
 
-	SiteInfo archiveInfos;
-
-	for (auto i = 0; i < urlSize; ++i)
+	if (i != urls.size())
 	{
-		auto& client = httpClients.at(i);
-		auto bufPerClient = client->GetResponseBuf();
-		auto sizePerClient = client->GetResponseSize();
-
-		std::string pagePerClient(bufPerClient, sizePerClient);
-		archiveInfos.emplace_back(urls.at(i), std::make_unique<HtmlDocument>());
-
-		auto& htmlDocument = archiveInfos.at(i).second;
-		htmlDocument->parse(pagePerClient);
+		urls.erase(urls.begin(), urls.begin() + i);
+		auto remainSiteInfo = RequestAndGetDoc(urls);
 	}
 
-	return archiveInfos;
+	return SiteInfo();
 }
 
 std::unique_ptr<HtmlDocument> BlogCrawler::GetMainDocument()

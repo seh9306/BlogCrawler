@@ -29,6 +29,7 @@ namespace blog
 {
 
 DevMicrosoftBlogCrawler::DevMicrosoftBlogCrawler()
+	: lastPageNumber_(0)
 {
 }
 
@@ -84,23 +85,29 @@ SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 		}
 	}
 
+	/*SiteInfo siteInfo;
+
+	for (auto articleUrl : articleUrls)
+	{
+		auto site = RequestAndGetDoc(articleUrl);
+		siteInfo.emplace_back(site.first, std::move(site.second));
+	}*/
+
 	return RequestAndGetDoc(articleUrls);
 }
 
 SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 {
-	auto mainDoc = GetMainDocument();
+	int lastPageNumber = GetLastPageNumber();
+	int goalPageNumber = pageIndex_ + requestPageNumberDegree_;
 
-	auto lastPageSelector = mainDoc->find(kSelectorForLastPageTag);
-	int lastPageNum = 0;
-	if (lastPageSelector.nodeNum() != 0)
+	if (lastPageNumber + 1 < goalPageNumber)
 	{
-		auto lastPageTag = lastPageSelector.nodeAt(0);
-		lastPageNum = std::stoi(lastPageTag.text());
+		goalPageNumber = lastPageNumber;
 	}
 
 	UrlList pageUrls;
-	for (int i = 1; i < 2/*lastPageNum + 1*/; ++i)
+	for (int i = pageIndex_; i < goalPageNumber; ++i)
 	{
 		std::string pageUrl(kIndexPath);
 		pageUrl.append(kPagePath);
@@ -109,7 +116,26 @@ SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 		pageUrls.emplace_back(pageUrl);
 	}
 
+	pageIndex_ = goalPageNumber;
+
 	return RequestAndGetDoc(pageUrls);
+}
+
+int DevMicrosoftBlogCrawler::GetLastPageNumber()
+{
+	if (lastPageNumber_ == 0)
+	{
+		auto mainDoc = GetMainDocument();
+
+		auto lastPageSelector = mainDoc->find(kSelectorForLastPageTag);
+		if (lastPageSelector.nodeNum() != 0)
+		{
+			auto lastPageTag = lastPageSelector.nodeAt(0);
+			lastPageNumber_ = std::stoi(lastPageTag.text());
+		}
+	}
+
+	return lastPageNumber_;
 }
 
 bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
@@ -121,6 +147,10 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 	for (auto& articleInfo : articleSites)
 	{
 		auto& articleDoc = articleInfo.second;
+		if (articleDoc.get() == nullptr)
+		{
+			continue;
+		}
 		auto titleSelector = articleDoc->find(kSelectorForTitle);
 		if (titleSelector.nodeNum() == 0)
 		{

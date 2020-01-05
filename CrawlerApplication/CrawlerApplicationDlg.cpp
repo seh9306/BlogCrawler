@@ -194,6 +194,7 @@ void CCrawlerApplicationDlg::OnClickedSearchButton()
 
 		std::string search = converter_.to_bytes(searchCstring.GetBuffer());
 		articles_ = std::move(blogArticleDao_->SelectArticles(search));
+		imageList_.Detach();
 		imageList_.Create(300, 300, ILC_COLOR32, 0, 1000);
 
 		CImage image;

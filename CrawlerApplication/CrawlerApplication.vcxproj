@@ -127,6 +127,8 @@
       <AdditionalDependencies>sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <HeapReserveSize>1024000000</HeapReserveSize>
       <StackReserveSize>1024000000</StackReserveSize>
+      <HeapCommitSize>
+      </HeapCommitSize>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -210,6 +212,7 @@
     <ClInclude Include="DevMicrosoftBlogCrawler.h" />
     <ClInclude Include="HerbsutterBlogCrawler.h" />
     <ClInclude Include="HttpClient.h" />
+    <ClInclude Include="HttpKeepAliveClient.h" />
     <ClInclude Include="ProgressObserver.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Query.h" />
@@ -227,6 +230,7 @@
     <ClCompile Include="DevMicrosoftBlogCrawler.cpp" />
     <ClCompile Include="HerbsutterBlogCrawler.cpp" />
     <ClCompile Include="HttpClient.cpp" />
+    <ClCompile Include="HttpKeepAliveClient.cpp" />
     <ClCompile Include="ProgressObserver.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -258,6 +262,7 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets" Condition="Exists('..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets')" />
     <Import Project="..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.71.0.0\build\boost.targets')" />
     <Import Project="..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets" Condition="Exists('..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets')" />
     <Import Project="..\packages\boost_bzip2-vc141.1.71.0.0\build\boost_bzip2-vc141.targets" Condition="Exists('..\packages\boost_bzip2-vc141.1.71.0.0\build\boost_bzip2-vc141.targets')" />
@@ -300,12 +305,12 @@
     <Import Project="..\packages\boost_wserialization-vc141.1.71.0.0\build\boost_wserialization-vc141.targets" Condition="Exists('..\packages\boost_wserialization-vc141.1.71.0.0\build\boost_wserialization-vc141.targets')" />
     <Import Project="..\packages\boost_zlib-vc141.1.71.0.0\build\boost_zlib-vc141.targets" Condition="Exists('..\packages\boost_zlib-vc141.1.71.0.0\build\boost_zlib-vc141.targets')" />
     <Import Project="..\packages\boost-vc141.1.71.0.0\build\boost-vc141.targets" Condition="Exists('..\packages\boost-vc141.1.71.0.0\build\boost-vc141.targets')" />
-    <Import Project="..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets" Condition="Exists('..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
     </PropertyGroup>
+    <Error Condition="!Exists('..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets'))" />
     <Error Condition="!Exists('..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.71.0.0\build\boost.targets'))" />
     <Error Condition="!Exists('..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets'))" />
     <Error Condition="!Exists('..\packages\boost_bzip2-vc141.1.71.0.0\build\boost_bzip2-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_bzip2-vc141.1.71.0.0\build\boost_bzip2-vc141.targets'))" />
@@ -348,6 +353,5 @@
     <Error Condition="!Exists('..\packages\boost_wserialization-vc141.1.71.0.0\build\boost_wserialization-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_wserialization-vc141.1.71.0.0\build\boost_wserialization-vc141.targets'))" />
     <Error Condition="!Exists('..\packages\boost_zlib-vc141.1.71.0.0\build\boost_zlib-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_zlib-vc141.1.71.0.0\build\boost_zlib-vc141.targets'))" />
     <Error Condition="!Exists('..\packages\boost-vc141.1.71.0.0\build\boost-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost-vc141.1.71.0.0\build\boost-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl-vc141-static-x86_64.1.1.0\build\native\openssl-vc141-static-x86_64.targets'))" />
   </Target>
 </Project>

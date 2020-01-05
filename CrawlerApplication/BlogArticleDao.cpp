@@ -120,7 +120,7 @@ bool BlogArticleDao::InsertArticles(model::ArticleList& articles)
 	std::string query(query::BEGIN_TRANSACTION);
 
 	for(model::Article& article : articles) {
-		sqlite3_prepare_v2(db_, query::INSERT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
+		int result = sqlite3_prepare_v2(db_, query::INSERT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
 		sqlite3_bind_text(pStmt, kTitle, article.title_.c_str(), article.title_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kUrl, article.url_.c_str(), article.url_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kImagePath, article.imagePath_.c_str(), article.imagePath_.size(), SQLITE_STATIC);

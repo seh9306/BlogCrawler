@@ -57,6 +57,8 @@ protected:
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 
 private:
+	SiteInfo GetHtmlBody(UrlList& urls, std::string stringForResponse);
+
 	// template method
 	virtual void CatchExceptionalUrlCase(std::string& url) = 0;
 	virtual bool GetAndInsertArticles(SiteInfo& HtmlDocuments) = 0;

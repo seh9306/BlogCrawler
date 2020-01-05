@@ -7,14 +7,6 @@
 
 using boost::asio::ip::tcp;
 
-namespace
-{
-	constexpr char* const kHttpVersion = "HTTP/1.1";
-	constexpr char* const kDoctype = "<!DOCTYPE html>";
-
-	constexpr int kDoctypeSize = 15;
-}
-
 namespace util
 {
 

@@ -3,6 +3,16 @@
 
 #include <boost/bind.hpp>
 
+namespace
+{
+
+constexpr char* const kHttpVersion = "HTTP/1.1";
+constexpr char* const kDoctype = "<!DOCTYPE html>";
+
+constexpr int kDoctypeSize = 15;
+
+}
+
 namespace util
 {
 
@@ -14,6 +24,7 @@ HttpClient::HttpClient(boost::asio::io_context& io_context,
 	: socket_(io_context, context),
 	statusCode_(StatusCode::kFail)
 {
+	response_.prepare(50000000);
 	std::ostream request_stream(&request_);
 	request_stream << "GET " << path << " " << kHttpVersion << "\r\n";
 	request_stream << "Host: " << host << "\r\n";
@@ -106,6 +117,10 @@ void HttpClient::ReadBody(const boost::system::error_code& error)
 {
 	if (!error)
 	{
+		/*boost::asio::read_until(socket_, response_, "\r\n\r\n");
+
+		std::istream responseStream(&response_);*/
+
 		boost::asio::async_read(socket_,
 			response_,
 			boost::asio::transfer_at_least(1),
