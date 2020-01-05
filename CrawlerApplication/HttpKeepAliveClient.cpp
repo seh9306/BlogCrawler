@@ -31,10 +31,10 @@ void HttpKeepAliveClient::Send(const char* host, const char* path)
 {
 	++requestNum_;
 	std::ostream request_stream(&request_);
-	request_stream << "GET " << path << " " << kHttpVersion << "\r\n";
-	request_stream << "Host: " << host << "\r\n";
-	request_stream << "Accept: */*\r\n";
-	request_stream << "Connection: Keep-Alive\r\n\r\n";
+	request_stream << kGet << path << " " << kHttpVersion << kNewLine;
+	request_stream << kHostHeader << host << kNewLine;
+	request_stream << kAcceptAllHeader << kNewLine;
+	request_stream << kConnectionKeepAliveHeader << kDoubleNewLine;
 }
 
 const char* HttpKeepAliveClient::GetResponseBuf() const
@@ -128,7 +128,7 @@ void HttpKeepAliveClient::SendRequest()
 	{
 		if (!error)
 		{
-			boost::asio::async_read_until(socket_, response_, "\r\n\r\n",
+			boost::asio::async_read_until(socket_, response_, kDoubleNewLine,
 				boost::bind(&HttpKeepAliveClient::Read, this, boost::asio::placeholders::error));
 		}
 	});
@@ -143,7 +143,7 @@ void HttpKeepAliveClient::Read(const boost::system::error_code& error)
 
 		while (size > responseBufOffset_)
 		{
-			if (std::strncmp("HTTP/1.1", responseBuf_ + responseBufOffset_, 8) == 0)
+			if (std::strncmp(kHttpVersion, responseBuf_ + responseBufOffset_, 8) == 0)
 			{
 				HtmlBodyInfo htmlBodyInfo;
 				htmlBodyInfo.body_ = const_cast<char*>(responseBuf_) + responseBufOffset_;
@@ -160,8 +160,8 @@ void HttpKeepAliveClient::Read(const boost::system::error_code& error)
 			auto findHtmlBase = const_cast<char*>(responseBuf_) + size;
 			auto findHtmlOffset = findHtmlBase;
 			while (responseBuf_ < findHtmlOffset
-				&& std::strncmp("</html>", findHtmlOffset - 7, 7)
-				&& std::strncmp("</body>", findHtmlOffset - 7, 7))
+				&& std::strncmp(kCloseHtmlTag, findHtmlOffset - 7, 7)
+				&& std::strncmp(kCloseBodyTag, findHtmlOffset - 7, 7))
 			{
 				if (findHtmlBase - findHtmlOffset > 500)
 				{

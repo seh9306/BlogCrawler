@@ -17,7 +17,8 @@ public:
 		boost::asio::ssl::context& context,
 		const tcp::resolver::results_type& endpoints,
 		const char* host,
-		const char* path);
+		const char* path,
+		int responseFirstBufSize = 20000000);
 	~HttpClient();
 
 	const char* GetResponseBuf() const;

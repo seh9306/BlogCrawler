@@ -12,16 +12,17 @@ HttpClient::HttpClient(boost::asio::io_context& io_context,
 	boost::asio::ssl::context& context,
 	const tcp::resolver::results_type& endpoints,
 	const char* host,
-	const char* path)
+	const char* path,
+	int responseFirstBufSize)
 	: socket_(io_context, context),
 	statusCode_(StatusCode::kFail)
 {
-	response_.prepare(50000000);
+	response_.prepare(responseFirstBufSize);
 	std::ostream request_stream(&request_);
-	request_stream << "GET " << path << " " << kHttpVersion << "\r\n";
-	request_stream << "Host: " << host << "\r\n";
-	request_stream << "Accept: */*\r\n";
-	request_stream << "Connection: close\r\n\r\n";
+	request_stream << kGet << path << " " << kHttpVersion << kNewLine;
+	request_stream << kHostHeader << host << kNewLine;
+	request_stream << kAcceptAllHeader << kNewLine;
+	request_stream << kConnectionCloseHeader << kDoubleNewLine;
 
 	Connect(endpoints);
 }
@@ -78,7 +79,7 @@ void HttpClient::SendRequest()
 	{
 		if (!error)
 		{
-			boost::asio::async_read_until(socket_, response_, "\r\n\r\n",
+			boost::asio::async_read_until(socket_, response_, kDoubleNewLine,
 				boost::bind(&HttpClient::ReadHeader, this, boost::asio::placeholders::error));
 		}
 	});
@@ -109,10 +110,6 @@ void HttpClient::ReadBody(const boost::system::error_code& error)
 {
 	if (!error)
 	{
-		/*boost::asio::read_until(socket_, response_, "\r\n\r\n");
-
-		std::istream responseStream(&response_);*/
-
 		boost::asio::async_read(socket_,
 			response_,
 			boost::asio::transfer_at_least(1),
