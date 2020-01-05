@@ -1,8 +1,6 @@
 ﻿
-// BlogCrawlerApplication.h: PROJECT_NAME 응용 프로그램에 대한 주 헤더 파일입니다.
-//
-
-#pragma once
+#ifndef CRAWLER_APPLICATION_H
+#define CRAWLER_APPLICATION_H
 
 #ifndef __AFXWIN_H__
 	#error "PCH에 대해 이 파일을 포함하기 전에 'stdafx.h'를 포함합니다."
@@ -41,3 +39,5 @@ private:
 };
 
 extern CCrawlerApplicationApp theApp;
+
+#endif

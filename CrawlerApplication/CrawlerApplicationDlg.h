@@ -1,6 +1,6 @@
 ﻿
-// BlogCrawlerApplicationDlg.h: 헤더 파일
-//
+#ifndef VIEW_CRAWLER_APPLICATION_H
+#define VIEW_CRAWLER_APPLICATION_H
 
 #pragma once
 
@@ -66,3 +66,5 @@ private:
 	DECLARE_MESSAGE_MAP()
 
 };
+
+#endif
