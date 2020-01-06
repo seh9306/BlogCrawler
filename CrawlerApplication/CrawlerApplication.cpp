@@ -3,24 +3,27 @@
 //
 
 #include "stdafx.h"
-#include "BlogCrawlerApplication.h"
-#include "BlogCrawlerApplicationDlg.h"
+#include "BlogCrawlService.h"
+#include "BlogArticleDao.h"
+#include "CrawlerApplication.h"
+#include "CrawlerApplicationDlg.h"
+#include "HttpKeepAliveClient.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CBlogCrawlerApplicationApp
+// CCrawlerApplicationApp
 
-BEGIN_MESSAGE_MAP(CBlogCrawlerApplicationApp, CWinApp)
+BEGIN_MESSAGE_MAP(CCrawlerApplicationApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CBlogCrawlerApplicationApp 생성
+// CCrawlerApplicationApp 생성
 
-CBlogCrawlerApplicationApp::CBlogCrawlerApplicationApp()
+CCrawlerApplicationApp::CCrawlerApplicationApp()
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -30,14 +33,14 @@ CBlogCrawlerApplicationApp::CBlogCrawlerApplicationApp()
 }
 
 
-// 유일한 CBlogCrawlerApplicationApp 개체입니다.
+// 유일한 CCrawlerApplicationApp 개체입니다.
 
-CBlogCrawlerApplicationApp theApp;
+CCrawlerApplicationApp theApp;
 
 
-// CBlogCrawlerApplicationApp 초기화
+// CCrawlerApplicationApp 초기화
 
-BOOL CBlogCrawlerApplicationApp::InitInstance()
+BOOL CCrawlerApplicationApp::InitInstance()
 {
 	// 응용 프로그램 매니페스트가 ComCtl32.dll 버전 6 이상을 사용하여 비주얼 스타일을
 	// 사용하도록 지정하는 경우, Windows XP 상에서 반드시 InitCommonControlsEx()가 필요합니다.
@@ -57,33 +60,27 @@ BOOL CBlogCrawlerApplicationApp::InitInstance()
 	// 대화 상자에 셸 트리 뷰 또는
 	// 셸 목록 뷰 컨트롤이 포함되어 있는 경우 셸 관리자를 만듭니다.
 	CShellManager *pShellManager = new CShellManager;
-
+	
 	// MFC 컨트롤의 테마를 사용하기 위해 "Windows 원형" 비주얼 관리자 활성화
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
-	// 표준 초기화
-	// 이들 기능을 사용하지 않고 최종 실행 파일의 크기를 줄이려면
-	// 아래에서 필요 없는 특정 초기화
-	// 루틴을 제거해야 합니다.
-	// 해당 설정이 저장된 레지스트리 키를 변경하십시오.
-	// TODO: 이 문자열을 회사 또는 조직의 이름과 같은
-	// 적절한 내용으로 수정해야 합니다.
-	SetRegistryKey(_T("로컬 응용 프로그램 마법사에서 생성된 응용 프로그램"));
+	SetRegistryKey(_T("Crawler"));
 
-	CBlogCrawlerApplicationDlg dlg;
+	CCrawlerApplicationDlg dlg;
+
+	observer::ObserverList observers;
+	observers.emplace_back(&dlg);
+
+	Initialize(observers);
+	
+	dlg.SetArticleBlogDao(blogArticleDao_);
 	m_pMainWnd = &dlg;
+
 	INT_PTR nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-		// TODO: 여기에 [확인]을 클릭하여 대화 상자가 없어질 때 처리할
-		//  코드를 배치합니다.
-	}
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO: 여기에 [취소]를 클릭하여 대화 상자가 없어질 때 처리할
-		//  코드를 배치합니다.
-	}
-	else if (nResponse == -1)
+
+	blogArticleDao_->Uninitialize();
+
+	if (nResponse == -1)
 	{
 		TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 응용 프로그램이 예기치 않게 종료됩니다.\n");
 		TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
@@ -99,8 +96,53 @@ BOOL CBlogCrawlerApplicationApp::InitInstance()
 	ControlBarCleanUp();
 #endif
 
-	// 대화 상자가 닫혔으므로 응용 프로그램의 메시지 펌프를 시작하지 않고  응용 프로그램을 끝낼 수 있도록 FALSE를
-	// 반환합니다.
 	return FALSE;
 }
 
+void CCrawlerApplicationApp::RunCrawlService() const
+{
+	for (auto& crawlService : crawlSerivces_)
+	{
+		crawlService->Execute();
+	}
+}
+
+void CCrawlerApplicationApp::Initialize(observer::ObserverList& observers)
+{
+	blogArticleDao_ = std::make_shared<dao::BlogArticleDao>();
+
+	blogArticleDao_->Initialize();
+
+	crawlSerivces_.push_back(std::make_unique<service::BlogCrawlService>());
+
+	for (auto& crawlService : crawlSerivces_)
+	{
+		crawlService->CreateCrawlers();
+		crawlService->SetProgressObserver(observers);
+		crawlService->SetDao(static_cast<void*>(&blogArticleDao_));
+	}
+
+	CreateDirectoryIfNotExist(L"images");
+}
+
+void CCrawlerApplicationApp::CreateDirectoryIfNotExist(std::wstring path)
+{
+	CFileFind file;
+
+	std::wstring search = path;
+	search.append(L"*.*");
+
+	if (file.FindFile(search.c_str()))
+	{
+		return;
+	}
+
+	path.append(L"\\");
+
+	if (!CreateDirectory(path.c_str(), NULL))
+	{
+		return;
+	}
+
+	return;
+}

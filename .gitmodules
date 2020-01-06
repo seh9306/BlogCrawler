@@ -1,0 +1,6 @@
+[submodule "gumbo-parser"]
+	path = gumbo-parser
+	url = https://github.com/seh9306/gumbo-parser.git
+[submodule "gumbo-query"]
+	path = gumbo-query
+	url = https://github.com/seh9306/gumbo-query.git
