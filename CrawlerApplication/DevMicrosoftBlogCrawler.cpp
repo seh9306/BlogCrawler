@@ -75,7 +75,8 @@ SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 
 	for (int i = 0; i < workerNum; ++i)
 	{
-		std::thread worker([&](int id) {
+		std::thread worker([&](int id) 
+		{			
 			UrlList articleUrls;
 			auto start = id * quotaPage + 1;
 			auto end = id + 1 == workerNum ? pageInfos.size() : (id + 1) * quotaPage + 1;
@@ -141,7 +142,8 @@ SiteInfo DevMicrosoftBlogCrawler::GetPageSiteInfos()
 
 	for (int i = 0; i < workerNum; ++i)
 	{
-		std::thread worker([&](int id) {
+		std::thread worker([&](int id) 
+		{
 			UrlList pageUrls;
 			auto start = id * quotaPage + 1;
 			auto end = (id + 1 == workerNum ? lastPageNumber : (id + 1) * quotaPage) + 1;

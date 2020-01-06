@@ -50,6 +50,7 @@ protected:
 	std::string DownloadImage(std::string& url);
 
 	std::unique_ptr<HtmlDocument> GetMainDocument();
+	time_t GetDate(std::string& url, const char* format);
 	void ModifyWrongUrl(std::string& url);
 	std::string RequestAndGetImage(std::string& host, std::string& urlPath);
 	SiteInfo RequestAndGetDoc(UrlList& urls);
@@ -61,7 +62,7 @@ private:
 	util::HtmlBodyInfoList GetHtmlBody(UrlList& urls, std::string& stringForResponse);
 
 	// template method
-	virtual bool GetAndInsertArticles(SiteInfo& HtmlDocuments) = 0;
+	virtual bool GetAndInsertArticles(SiteInfo& pageSiteInfos) = 0;
 
 	virtual const char* const GetHost() const = 0;
 	virtual const char* const GetIndexPath() const = 0;

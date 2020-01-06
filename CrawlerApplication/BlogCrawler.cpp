@@ -2,6 +2,8 @@
 #include "BlogCrawler.h"
 
 #include <fstream>
+#include <ctime>   
+#include <iomanip>
 #include <Node.h>
 
 #include "BlogArticleDao.h"
@@ -9,6 +11,14 @@
 #include "HttpDefine.h"
 #include "HttpKeepAliveClient.h"
 #include "ProgressDefine.h"
+
+namespace
+{
+
+constexpr char* kLocale = "de_DE.utf-8";
+constexpr char* kAppendTime = " 00:00:00";
+
+}
 
 namespace crawler
 {
@@ -66,6 +76,7 @@ std::string BlogCrawler::DownloadImage(std::string& urlPath)
 	return RequestAndGetImage(host, path);
 }
 /*
+
 Site BlogCrawler::RequestAndGetDoc(std::string& path)
 {
 	auto statusCode = httpClient->GetStatusCode();
@@ -116,7 +127,8 @@ std::string BlogCrawler::RequestAndGetImage(std::string& host, std::string& urlP
 
 	std::ofstream writeFile(fullPath.data(), std::ios::binary);
 
-	if (writeFile.is_open()) {
+	if (writeFile.is_open()) 
+	{
 		writeFile.write(imageBuf, size);
 		writeFile.close();
 	}
@@ -226,12 +238,42 @@ util::HtmlBodyInfoList BlogCrawler::GetHtmlBody(UrlList& urls, std::string& stri
 
 std::unique_ptr<HtmlDocument> BlogCrawler::GetMainDocument()
 {
-	UrlList urlList;
+	UrlList urls;
 	
-	urlList.emplace_back(GetIndexPath());
-	auto siteInfo = RequestAndGetDoc(urlList);
+	urls.emplace_back(GetIndexPath());
+	auto siteInfo = RequestAndGetDoc(urls);
 
 	return std::move(siteInfo.at(0).second);
+}
+
+std::time_t BlogCrawler::GetDate(std::string& url, const char* format)
+{
+	auto protocol = url.find(u8"//");
+	if (protocol == std::string::npos)
+	{
+		return 0;
+	}
+
+	auto index = url.find(u8'/', protocol + 2);
+	if (index == std::string::npos)
+	{
+		return 0;
+	}
+
+	auto endindex = url.rfind(u8'/', url.size() - 2);
+	if (endindex == std::string::npos)
+	{
+		return 0;
+	}
+
+	auto date = url.substr(index + 1, endindex - index - 1);
+
+	struct std::tm tm;
+	std::istringstream ss(date.append(kAppendTime).c_str());
+	ss.imbue(std::locale());
+	ss >> std::get_time(&tm, format/*"%Y/%m/%d %H:%M:%S"*/);
+
+	return mktime(&tm);
 }
 
 void BlogCrawler::ModifyWrongUrl(std::string& url)

@@ -17,7 +17,7 @@ public:
 	virtual ~HerbsutterBlogCrawler();
 
 private:
-	bool GetAndInsertArticles(SiteInfo& HtmlDocuments) override;
+	bool GetAndInsertArticles(SiteInfo& pageSiteInfos) override;
 
 	const char* const GetHost() const override;
 	const char* const GetIndexPath() const override;

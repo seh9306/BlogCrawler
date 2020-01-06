@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "HerbsutterBlogCrawler.h"
 
+#include <ctime>   
 #include <Document.h>
+#include <iomanip>
 #include <Node.h>
 
 #include "Article.h"
@@ -23,6 +25,8 @@ constexpr char* const kSelectorContentTag = u8"div.entry-content";
 constexpr char* const kSelectorImgTag = u8"img";
 
 constexpr int pageLimit = 10;
+
+constexpr char* const kDateFormat = "%Y/%m/%d %H:%M:%S";
 
 }
 
@@ -141,6 +145,8 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 			{
 				continue;
 			}
+
+			article.date_ = GetDate(article.url_, kDateFormat);
 
 			auto contentTagSelection = articleSelection.find(kSelectorContentTag);
 

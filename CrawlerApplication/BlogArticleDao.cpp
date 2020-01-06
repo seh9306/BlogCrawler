@@ -63,6 +63,7 @@ constexpr int kTitle = 1;
 constexpr int kUrl = 2;
 constexpr int kImagePath = 3;
 constexpr int kContent = 4;
+constexpr int kDate = 5;
 
 constexpr int kSearch = 1;
 
@@ -121,12 +122,14 @@ bool BlogArticleDao::InsertArticles(model::ArticleList& articles)
 
 	std::string query(query::BEGIN_TRANSACTION);
 
-	for(model::Article& article : articles) {
+	for(model::Article& article : articles) 
+	{
 		int result = sqlite3_prepare_v2(db_, query::INSERT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
 		sqlite3_bind_text(pStmt, kTitle, article.title_.c_str(), article.title_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kUrl, article.url_.c_str(), article.url_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kImagePath, article.imagePath_.c_str(), article.imagePath_.size(), SQLITE_STATIC);
 		sqlite3_bind_text(pStmt, kContent, article.content_.c_str(), article.content_.size(), SQLITE_STATIC);
+		sqlite3_bind_int64(pStmt, kDate, article.date_);
 
 		query.append(sqlite3_expanded_sql(pStmt));
 
@@ -150,12 +153,13 @@ model::ArticleList BlogArticleDao::SelectArticles(std::string search)
 {
 	sqlite3_stmt* pStmt = NULL;
 
-	std::string query(query::SELECT_LIKE_ARTICLES_QUERY_START);
-	query.append(search);
-	query.append(query::SELECT_LIKE_ARTICLES_QUERY_END);
+	int result = sqlite3_prepare_v2(db_, query::SELECT_ORDER_BY_MATCH_COUNT_ARTICLES_QUERY, kZeroEndString, &pStmt, nullptr);
+	sqlite3_bind_text(pStmt, 1, search.c_str(), search.size(), SQLITE_STATIC);
+	sqlite3_bind_text(pStmt, 2, search.c_str(), search.size(), SQLITE_STATIC);
 
 	model::ArticleList articles;
-	Sqlite3Exec(query.c_str(), kSelectAllAritcle, articles);
+	auto query = sqlite3_expanded_sql(pStmt);
+	Sqlite3Exec(query, kSelectAllAritcle, articles);
 
 	sqlite3_finalize(pStmt);
 
@@ -173,7 +177,7 @@ int BlogArticleDao::SelectAllAritcle(int argc, char** argv, char** azColName, mo
 	{
 		return kBadAction;
 	}
-	ptrArticles->emplace_back(std::stoi(argv[kId]), argv[kTitle], argv[kUrl], argv[kImagePath], argv[kContent]);
+	ptrArticles->emplace_back(std::stoi(argv[kId]), argv[kTitle], argv[kUrl], argv[kImagePath]);
 
 	return kSqliteOK;
 }
@@ -189,7 +193,8 @@ int BlogArticleDao::Sqlite3Exec(const char* const query, sqlite3_callback callba
 
 	int rc = sqlite3_exec(db_, query, callback, data, &zErrMsg);
 
-	if (rc != kSqliteOK) {
+	if (rc != kSqliteOK) 
+	{
 		sqlite3_free(zErrMsg);
 	}
 

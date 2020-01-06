@@ -29,7 +29,8 @@ void ProgressSubject::Attach(ProgressObserver* observer)
 
 void ProgressSubject::Detach(ProgressObserver* observer)
 {
-	for (auto iter = observers_.begin(); iter != observers_.end(); ++iter) {
+	for (auto iter = observers_.begin(); iter != observers_.end(); ++iter) 
+	{
 		if ((*iter) == observer)
 		{
 			iter = observers_.erase(iter);

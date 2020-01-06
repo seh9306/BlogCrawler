@@ -7,6 +7,7 @@
 #include "CrawlerApplicationDlg.h"
 #include "afxdialogex.h"
 
+#include <algorithm>
 #include <thread>
 
 #include "BlogArticleDao.h"
@@ -234,7 +235,9 @@ void CCrawlerApplicationDlg::OnClickedSearchButton()
 		searchEdit_.GetWindowTextW(searchCstring);
 
 		std::string search = converter_.to_bytes(searchCstring.GetBuffer());
-		articles_ = std::move(blogArticleDao_->SelectArticles(search));
+		articles_ = blogArticleDao_->SelectArticles(search);
+
+		
 
 		imageList_.Detach();
 		imageList_.Create(300, 300, ILC_COLOR32, 0, 1000);
@@ -352,7 +355,7 @@ void CCrawlerApplicationDlg::OnArticleItemClickList(NMHDR *pNMHDR, LRESULT *pRes
 		return;
 	}
 
-	auto article = articles_.at(pNMItemActivate->iItem);
+	auto& article = articles_.at(pNMItemActivate->iItem);
 	auto url = converter_.from_bytes(article.url_);
 	
 	ShellExecute(NULL, L"open", url.c_str(), L"", L"", SW_SHOW);

@@ -2,6 +2,7 @@
 #define MODEL_ARTICLE_H
 
 #include <string>
+#include <ctime>
 
 namespace model
 {
@@ -27,7 +28,22 @@ struct Article
 		: title_(title),
 		url_(url),
 		imagePath_(imagePath),
-		content_(content)
+		content_(content),
+		date_(0)
+	{
+		id_ = -1;
+	}
+
+	Article(std::string title,
+		std::string url,
+		std::string imagePath,
+		std::string content,
+		std::time_t date)
+		: title_(title),
+		url_(url),
+		imagePath_(imagePath),
+		content_(content),
+		date_(date)
 	{
 		id_ = -1;
 	}
@@ -35,11 +51,12 @@ struct Article
 	Article(int id,
 		std::string title,
 		std::string url,
-		std::string imagePath,
-		std::string content)
-		: Article(title, url, imagePath, content)
+		std::string imagePath
+	)
+		: Article(title, url, imagePath, "")
 	{
 		id_ = id;
+		date_ = 0;
 	}
 
 	Article(const Article& article)
@@ -49,15 +66,7 @@ struct Article
 		url_ = article.url_;
 		imagePath_ = article.imagePath_;
 		content_ = article.content_;
-	}
-
-	Article(const Article&& article)
-	{
-		id_ = article.id_;
-		title_ = std::move(article.title_);
-		url_ = std::move(article.url_);
-		imagePath_ = std::move(article.imagePath_);
-		content_ = std::move(article.content_);
+		date_ = article.date_;
 	}
 
 	int id_;
@@ -65,6 +74,8 @@ struct Article
 	std::string url_;
 	std::string imagePath_;
 	std::string content_;
+	std::time_t date_;
+
 };
 
 
