@@ -35,7 +35,7 @@ public:
 	
 	size_t GetResponseSize() const;
 
-	void GetResponseLine(std::string & out);
+	void GetResponses(std::string & out);
 
 private:
 	void Connect(const tcp::resolver::results_type& endpoints);

@@ -52,7 +52,7 @@ size_t HttpKeepAliveClient::GetResponseSize() const
 	return response_.size();
 }
 
-void HttpKeepAliveClient::GetResponseLine(std::string& out)
+void HttpKeepAliveClient::GetResponses(std::string& out)
 {
 	auto responseSize = response_.size();
 	out.reserve(responseSize);

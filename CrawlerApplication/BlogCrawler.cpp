@@ -133,7 +133,7 @@ SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
 	ioContextToGetArticles.run();
 
 	std::string stringForResponse;
-	httpKeepAliveClient.GetResponseLine(stringForResponse);
+	httpKeepAliveClient.GetResponses(stringForResponse);
 
 	auto htmlBodyInfos = GetHtmlBody(urls, stringForResponse);
 

@@ -43,7 +43,7 @@ public:
 	BlogCrawler();
 	virtual ~BlogCrawler();
 
-	virtual bool Crawl() override;
+	bool Crawl() override;
 	void SetDao(void* dao) override;
 
 protected:
@@ -61,7 +61,6 @@ protected:
 private:
 	util::HtmlBodyInfoList GetHtmlBody(UrlList& urls, std::string& stringForResponse);
 
-	// template method
 	virtual bool GetAndInsertArticles(SiteInfo& pageSiteInfos) = 0;
 
 	virtual const char* const GetHost() const = 0;
