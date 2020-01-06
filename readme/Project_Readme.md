@@ -38,3 +38,11 @@ Notify crawling progress observer
 ## ProgressObserver
 
 Updated by crawling progress subject
+
+## HttpClient
+
+http client for request (images..)
+
+## HttpKeepAliveClient
+
+http client for keep alive request (articles..)
