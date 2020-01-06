@@ -1,94 +1,54 @@
 # Crawler
 
-## 사용 라이브러리
+The crawler is a Win 32 Application that searches `https://devblogs.microsoft.com/oldnewthing/` and `https://herbsutter.com/` using [boost asio](https://think-async.com/Asio/).
 
-HTTP Module : Boost 1.71.0 (asio)
+In addition, it has the following additional functions.
+* The request and parsing parts were implemented in `parallel`.
+* `Object-oriented` design makes it easy to add a web blog crawler and an api crawler.
+* When searching, the virtual list is displayed even `if the number of items is large`.
 
-HTML5 parser Module : gumbo
+Please check Project details for more information.
 
-XML parser Module로 pugixml, tinyxml2, libxml2, rapidxml 등을 이용해보았음.
 
-하지만 xml parser는 HTML5 태그를 지원하지 않음. (syntax error)
 
-- example
-```html
-<meta charset="UTF-8">
-<br>
-```
-위와 같이 닫는 태그가 없는 경우 xml 문법 오류가 발생함.
+<br/><br/>
 
-## 크롤링 대상 사이트 분석
+## Project Details
 
-대상 사이트를 요청하면 response body에 불필요한 데이터가 포함되어 있어 걸러주어야함.
-1. herbsutter.com/
+For details on project structure and technical design, please see the [Project Readme](/readme/Project_Readme.md).
 
-- Article list ( path = "/" )
-```html
-<!DOCTYPE HTML>
-<html>
-    ...
-    <aside id="archives-4" ...>
-        ...
-        <ul>
-            <li>
-                <a href="https://herbsutter.com/2019/10">October 2019</a>
-            </li>
-            ...
-        </ul>
-    </aside>
-</html>
-```
 
-selector archives : **"#archives-4 > ul > li"**
 
-- Article according to date ( path = "/[year]/[month]")
+<br/><br/>
 
-```html
-<!DOCTYPE HTML>
-<html>
-    ...
-    <main id="main">
-        ...
-       <article id="post-3799" ...>
-           <header class="entry-header">
-	    		<h1 class="entry-title">
-                    <a href="https://herbsutter.com/2019/09/26/my-cppcon-2019-talk-video-is-online/">
-                    <!-- title -->
-                    </a>
-                </h1>		
-            </header>
-            ...
-       </article>
-       <article id="post-3786" ...>
-           <!-- Article content -->
-       </article>
-       <article id="post-3780" ...>
-           <!-- Article content -->
-       </article>
-        ...
-    </main>
-</html>
-```
+## Fast Start
 
-- Article ( path = "/[year]/[month]/[title]")
+### Install Crawler
 
-```html
-<!DOCTYPE HTML>
-<html>
-    ...
-    <main id="main">
-        ...
-       <article id="post-3799" ...>
-            ...
-            <div class="entry-content">
-                <!-- Article content -->
-        	</div>
-       </article>
-    </main>
-</html>
-```
+~~~
+git clone https://github.com/seh9306/Crawler.git
+~~~
 
----
-2. devblogs.microsoft.com/oldnewthing/
+### Submodule Update
 
-reponse body(html)에 \n00006000\n 형식으로 비정상 적인 값이 들어있는 케이스가 존재.
+~~~
+git submodule init 
+git submodule update
+~~~
+
+### Connect Dll Link
+
+> It tells the `Crawler.exe` the path to the `sqlite.dll` file.
+
+
+<br/><br/>
+
+## Demo
+
+### Gif
+
+> Blog 
+
+<p align="center">
+   <img src="/md_images/system.gif" width="740px" height="383px"/>
+</p>
