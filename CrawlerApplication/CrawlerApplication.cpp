@@ -78,6 +78,8 @@ BOOL CCrawlerApplicationApp::InitInstance()
 
 	INT_PTR nResponse = dlg.DoModal();
 
+	blogArticleDao_->Uninitialize();
+
 	if (nResponse == -1)
 	{
 		TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 응용 프로그램이 예기치 않게 종료됩니다.\n");

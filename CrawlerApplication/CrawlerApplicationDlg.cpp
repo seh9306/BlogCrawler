@@ -297,7 +297,6 @@ void CCrawlerApplicationDlg::Update(observer::ProgressComplete progress)
 	
 	if (score == 100)
 	{
-		blogArticleDao_->Uninitialize();
 		MessageBox(_T("크롤링이 완료되었습니다."), _T("Crawler"), 0);
 	}
 	progressCtrl_.SetPos(progressCtrl_.GetPos() + score);
