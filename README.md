@@ -18,6 +18,12 @@ Please check Project details for more information.
 For details on project structure and technical design, please see the [Project Readme](/readme/Project_Readme.md).
 
 
+<br/><br/>
+
+## IDE
+
+Microsoft Visual Studio 2017 version 15.9.11
+
 
 <br/><br/>
 
