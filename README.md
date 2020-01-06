@@ -17,6 +17,8 @@ Please check Project details for more information.
 
 For details on project structure and technical design, please see the [Project Readme](/readme/Project_Readme.md).
 
+Support only 64 bit build now because of memory. 
+
 
 <br/><br/>
 
