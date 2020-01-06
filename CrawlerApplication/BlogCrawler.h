@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Crawler.h"
+#include "HttpClient.h"
 #include "HttpKeepAliveClient.h"
 
 namespace dao
@@ -49,9 +50,10 @@ protected:
 	std::string DownloadImage(std::string& url);
 
 	std::unique_ptr<HtmlDocument> GetMainDocument();
-	Site RequestAndGetDoc(std::string path);
+	void ModifyWrongUrl(std::string& url);
+	std::string RequestAndGetImage(std::string& host, std::string& urlPath);
 	SiteInfo RequestAndGetDoc(UrlList& urls);
-
+	
 	boost::asio::ssl::context ctx_;
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;
 

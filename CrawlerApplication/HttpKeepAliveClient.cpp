@@ -68,26 +68,31 @@ void HttpKeepAliveClient::GetResponseLine(std::string& out)
 		{
 			out.append(startOffset, offset - 1);
 			startOffset = offset + 11;
+			response_.consume((offset - startOffset) + 10);
 		}
 		else if (std::strncmp(offset, "\n00004000\r\n\n", 12) == 0)
 		{
 			out.append(startOffset, offset - 1);
 			startOffset = offset + 12;
+			response_.consume((offset - startOffset) + 11);
 		}
 		else if (std::strncmp(offset, "\n00006000\r\n\n", 12) == 0)
 		{
 			out.append(startOffset, offset - 1);
 			startOffset = offset + 12;
+			response_.consume((offset - startOffset) + 11);
 		}
 		else if (std::strncmp(offset, "\n00004000\r\n", 11) == 0)
 		{
 			out.append(startOffset, offset - 1);
 			startOffset = offset + 11;
+			response_.consume((offset - startOffset) + 10);
 		}
 		else if (std::strncmp(offset, "\n00006000\r\n", 11) == 0)
 		{
 			out.append(startOffset, offset - 1);
 			startOffset = offset + 11;
+			response_.consume((offset - startOffset) + 10);
 		}
 
 		++offset;
@@ -186,6 +191,8 @@ void HttpKeepAliveClient::Read(const boost::system::error_code& error)
 			boost::bind(&HttpKeepAliveClient::Read, this, boost::asio::placeholders::error));
 
 	}
+
+	auto me = error.message();
 
 }
 

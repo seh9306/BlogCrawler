@@ -18,12 +18,13 @@ public:
 		const tcp::resolver::results_type& endpoints,
 		const char* host,
 		const char* path,
-		int responseFirstBufSize = 20000000);
+		int responseFirstBufSize = 100000);
 	~HttpClient();
 
 	const char* GetResponseBuf() const;
 	size_t GetResponseSize() const;
 	int GetStatusCode() const;
+	int GetContentLength() const;
 
 private:
 	void Connect(const tcp::resolver::results_type& endpoints);
@@ -33,13 +34,13 @@ private:
 	void ReadBody(const boost::system::error_code& error);
 
 	bool GetResponseCodeFromHeader(std::istream& header);
-	void ConsumeUnnecessaryData();
 
 	boost::asio::ssl::stream<tcp::socket> socket_;
 	boost::asio::streambuf request_;
 	boost::asio::streambuf response_;
 
 	int statusCode_;
+	int contentLength_;
 };
 
 }

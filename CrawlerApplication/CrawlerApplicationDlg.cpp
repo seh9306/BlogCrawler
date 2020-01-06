@@ -235,15 +235,46 @@ void CCrawlerApplicationDlg::OnClickedSearchButton()
 
 		std::string search = converter_.to_bytes(searchCstring.GetBuffer());
 		articles_ = std::move(blogArticleDao_->SelectArticles(search));
+
 		imageList_.Detach();
 		imageList_.Create(300, 300, ILC_COLOR32, 0, 1000);
 
-		CImage image;
-		image.Load(_T("C:\\Users\\Park\\Desktop\\dev\\Crawler\\x64\\Debug\\red.png")); 
-		CBitmap bitmap;
-		bitmap.Attach(image.Detach());
+		CImage image, temp;
+		CRect rect;
+		
+		searchList_.GetWindowRect(rect);
+		auto width = rect.Width() * 0.4;
+		auto imageCount = 0;
 
-		imageList_.Add(&bitmap, ILC_COLOR32);
+		for (auto& article : articles_)
+		{
+			if (article.imagePath_.empty())
+			{
+				continue;
+			}
+			auto imagePathUTF16 = converter_.from_bytes(article.imagePath_);
+
+			if (image.Load(imagePathUTF16.c_str()) != S_OK)
+			{
+				continue;
+			}
+
+			temp.Create(width, 300, image.GetBPP());
+
+			HDC hdc = temp.GetDC();
+
+			SetStretchBltMode(hdc, HALFTONE);
+			image.StretchBlt(hdc, 0, 0, width, 300, 0, 0, image.GetWidth(), image.GetHeight(), SRCCOPY);
+			temp.ReleaseDC();
+
+			CBitmap bitmap;
+			bitmap.Attach(temp.Detach());
+
+			imageList_.Add(&bitmap, ILC_COLOR32);
+			image.Detach();
+
+			imageInfoMap_[article.id_] = imageCount++;
+		}
 
 		searchList_.SetImageList(&imageList_, LVSIL_SMALL);
 		searchList_.SetItemCountEx(static_cast<int>(articles_.size()), LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
@@ -301,7 +332,12 @@ void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pR
 
 	if (pItem->mask & LVIF_IMAGE)
 	{
-		pItem->iImage = 0;
+		auto imageIndex = imageInfoMap_.find(article.id_);
+		if (imageIndex != imageInfoMap_.end())
+		{
+			pItem->iImage = imageIndex->second;
+		}
+		
 	}
 
 	*pResult = 0;

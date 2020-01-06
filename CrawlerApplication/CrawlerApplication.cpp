@@ -60,7 +60,7 @@ BOOL CCrawlerApplicationApp::InitInstance()
 	// 대화 상자에 셸 트리 뷰 또는
 	// 셸 목록 뷰 컨트롤이 포함되어 있는 경우 셸 관리자를 만듭니다.
 	CShellManager *pShellManager = new CShellManager;
-
+	
 	// MFC 컨트롤의 테마를 사용하기 위해 "Windows 원형" 비주얼 관리자 활성화
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
@@ -94,8 +94,6 @@ BOOL CCrawlerApplicationApp::InitInstance()
 	ControlBarCleanUp();
 #endif
 
-	// 대화 상자가 닫혔으므로 응용 프로그램의 메시지 펌프를 시작하지 않고  응용 프로그램을 끝낼 수 있도록 FALSE를
-	// 반환합니다.
 	return FALSE;
 }
 
@@ -120,23 +118,29 @@ void CCrawlerApplicationApp::Initialize(observer::ObserverList& observers)
 		crawlService->CreateCrawlers();
 		crawlService->SetProgressObserver(observers);
 		crawlService->SetDao(static_cast<void*>(&blogArticleDao_));
-	}/*
+	}
 
-	boost::asio::io_context ioContextToGetArticles;
-	tcp::resolver resolver(ioContextToGetArticles);
-	tcp::resolver::query query(u8"herbsutter.com", "https");
-	auto endpoints = resolver.resolve(query);
-	boost::asio::ssl::context ctx_(boost::asio::ssl::context::sslv23);
-	ctx_.set_verify_mode(boost::asio::ssl::verify_none);
-	util::HttpKeepAliveClient c(ioContextToGetArticles, ctx_, endpoints);
-	c.Send(u8"herbsutter.com", u8"/page/2/");
-	c.Send(u8"herbsutter.com", u8"/page/3/");
-	c.Send(u8"herbsutter.com", u8"/page/4/");
-	c.Send(u8"herbsutter.com", u8"/page/5/");
-	c.Close(u8"herbsutter.com", u8"/page/6/");
-	ioContextToGetArticles.run();
+	CreateDirectoryIfNotExist(L"images");
+}
 
-	auto buf = c.GetHtmlBodyInfos();
-	auto size = c.GetResponseSize();*/
+void CCrawlerApplicationApp::CreateDirectoryIfNotExist(std::wstring path)
+{
+	CFileFind file;
 
+	std::wstring search = path;
+	search.append(L"*.*");
+
+	if (file.FindFile(search.c_str()))
+	{
+		return;
+	}
+
+	path.append(L"\\");
+
+	if (!CreateDirectory(path.c_str(), NULL))
+	{
+		return;
+	}
+
+	return;
 }

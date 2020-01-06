@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BlogCrawler.h"
 
+#include <fstream>
 #include <Node.h>
 
 #include "BlogArticleDao.h"
@@ -45,22 +46,28 @@ void BlogCrawler::SetDao(void* dao)
 	blogArticleDao_ = *(static_cast<std::shared_ptr<dao::BlogArticleDao>*>(dao));
 }
 
-std::string BlogCrawler::DownloadImage(std::string& url)
+std::string BlogCrawler::DownloadImage(std::string& urlPath)
 {
-	return std::string();
+	auto protocol = urlPath.find(u8"//");
+	if (protocol == std::string::npos)
+	{
+		return "";
+	}
+
+	auto index = urlPath.find(u8'/', protocol + 2);
+	if (index == std::string::npos)
+	{
+		return "";
+	}
+
+	auto host = urlPath.substr(protocol + 2, index - (protocol + 2));
+	auto path = urlPath.substr(index);
+
+	return RequestAndGetImage(host, path);
 }
-
-Site BlogCrawler::RequestAndGetDoc(std::string path)
+/*
+Site BlogCrawler::RequestAndGetDoc(std::string& path)
 {
-	boost::asio::io_context ioContextToGetArticles;
-	tcp::resolver resolver(ioContextToGetArticles);
-	tcp::resolver::query query(GetHost(), util::kHttps);
-	auto endpoints = resolver.resolve(query);
-
-	auto httpClient = std::make_unique<util::HttpClient>(ioContextToGetArticles, ctx_, endpoints, GetHost(), path.c_str());
-
-	ioContextToGetArticles.run();
-
 	auto statusCode = httpClient->GetStatusCode();
 	if (statusCode != util::StatusCode::kResponseOK)
 	{
@@ -76,6 +83,45 @@ Site BlogCrawler::RequestAndGetDoc(std::string path)
 	htmlDocument->parse(pagePerClient);
 	
 	return { path, std::move(htmlDocument) };
+}
+*/
+std::string BlogCrawler::RequestAndGetImage(std::string& host, std::string& urlPath)
+{
+	boost::asio::io_context ioContextToGetArticles;
+	tcp::resolver resolver(ioContextToGetArticles);
+
+	//ModifyWrongUrl(host);
+	tcp::resolver::query query(host, util::kHttps);
+	auto endpoints = resolver.resolve(query);
+
+	auto httpClient = std::make_unique<util::HttpClient>(ioContextToGetArticles, ctx_, endpoints, host.c_str(), urlPath.c_str());
+
+	ioContextToGetArticles.run();
+
+	auto dotIndex = urlPath.find(u8'.');
+	auto fileNameStart = urlPath.rfind(u8'/', dotIndex);
+	auto fileNameEnd = urlPath.find(u8'?', dotIndex);
+
+	auto realFileName = urlPath.substr(fileNameStart + 1, fileNameEnd - (fileNameStart + 1));
+	auto imagePath = std::string(u8"images\\");
+	auto fullPath = imagePath.append(realFileName);
+
+	if (httpClient->GetStatusCode() != util::kResponseOK)
+	{
+		return "";
+	}
+
+	auto imageBuf = httpClient->GetResponseBuf();
+	auto size = httpClient->GetResponseSize();
+
+	std::ofstream writeFile(fullPath.data(), std::ios::binary);
+
+	if (writeFile.is_open()) {
+		writeFile.write(imageBuf, size);
+		writeFile.close();
+	}
+
+	return imagePath;
 }
 
 SiteInfo BlogCrawler::RequestAndGetDoc(UrlList& urls)
@@ -186,6 +232,24 @@ std::unique_ptr<HtmlDocument> BlogCrawler::GetMainDocument()
 	auto siteInfo = RequestAndGetDoc(urlList);
 
 	return std::move(siteInfo.at(0).second);
+}
+
+void BlogCrawler::ModifyWrongUrl(std::string& url)
+{
+	auto index = url.find(u8"\n");
+	if (index == std::string::npos)
+	{
+		return;
+	}
+
+	auto endIndex = url.find(u8"\n");
+
+	if (endIndex == std::string::npos)
+	{
+		return;
+	}
+
+	url.erase(url.begin() + index, url.begin() + endIndex);
 }
 
 }

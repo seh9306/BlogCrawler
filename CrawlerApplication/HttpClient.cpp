@@ -2,6 +2,7 @@
 #include "HttpClient.h"
 
 #include <boost/bind.hpp>
+#include <fstream>
 
 #include "HttpDefine.h"
 
@@ -18,6 +19,7 @@ HttpClient::HttpClient(boost::asio::io_context& io_context,
 	statusCode_(StatusCode::kFail)
 {
 	response_.prepare(responseFirstBufSize);
+
 	std::ostream request_stream(&request_);
 	request_stream << kGet << path << " " << kHttpVersion << kNewLine;
 	request_stream << kHostHeader << host << kNewLine;
@@ -44,6 +46,11 @@ size_t HttpClient::GetResponseSize() const
 int HttpClient::GetStatusCode() const
 {
 	return statusCode_;
+}
+
+int HttpClient::GetContentLength() const
+{
+	return contentLength_;
 }
 
 void HttpClient::Connect(const tcp::resolver::results_type& endpoints)
@@ -97,7 +104,25 @@ void HttpClient::ReadHeader(const boost::system::error_code& error)
 		}
 
 		std::string header;
-		while (std::getline(headerStream, header) && header != "\r");
+		while (std::getline(headerStream, header) && header != "\r")
+		{
+			for (auto& character : header)
+			{
+				character = std::tolower(character);
+			}
+	
+			if (header.find(kContentLength) != std::string::npos)
+			{
+				auto colonIndex = header.find(':');
+
+				if (colonIndex == std::string::npos)
+				{
+					continue;
+				}
+
+				contentLength_ = std::stoi(header.substr(colonIndex + 1));
+			}
+		}
 
 		boost::asio::async_read(socket_,
 			response_,
@@ -118,10 +143,6 @@ void HttpClient::ReadBody(const boost::system::error_code& error)
 	else if (error != boost::asio::error::eof)
 	{
 		statusCode_ = StatusCode::kFail;
-	}
-	else
-	{
-		ConsumeUnnecessaryData();
 	}
 }
 
@@ -147,17 +168,6 @@ bool HttpClient::GetResponseCodeFromHeader(std::istream& headerStream)
 	response_.consume(2);
 
 	return true;
-}
-
-void HttpClient::ConsumeUnnecessaryData()
-{
-	const char* buf = GetResponseBuf();
-	while (GetResponseSize() > kDoctypeSize
-		&& std::strncmp(kDoctype, buf, kDoctypeSize))
-	{
-		response_.consume(1);
-		buf = GetResponseBuf();
-	};
 }
 
 }

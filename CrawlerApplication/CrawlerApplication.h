@@ -31,6 +31,7 @@ public:
 
 private:
 	void Initialize(observer::ObserverList& observers);
+	void CreateDirectoryIfNotExist(std::wstring path);
 
 	std::vector<std::unique_ptr<service::CrawlService>> crawlSerivces_;
 	std::shared_ptr<dao::BlogArticleDao> blogArticleDao_;

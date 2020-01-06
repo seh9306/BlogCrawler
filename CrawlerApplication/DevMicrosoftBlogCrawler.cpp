@@ -95,8 +95,10 @@ SiteInfo DevMicrosoftBlogCrawler::GetArticleSiteInfos(SiteInfo& pageInfos)
 						continue;
 					}
 					auto urlTag = urlTagSelector.nodeAt(0);
+					auto url = urlTag.attribute(kUrlAttribute);
 
-					articleUrls.emplace_back(urlTag.attribute(kUrlAttribute));
+					ModifyWrongUrl(url);
+					articleUrls.emplace_back(url);
 				}
 			}
 
@@ -241,6 +243,7 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 		if (imgTagSelection.nodeNum() != 0)
 		{
 			auto url = imgTagSelection.nodeAt(0).attribute(kSrcAttribute);
+			ModifyWrongUrl(url);
 			imagePath = DownloadImage(url);
 		}
 

@@ -22,6 +22,8 @@ constexpr char* const kSelectorTitleAndUrlTag = u8"header > h1 > a";
 constexpr char* const kSelectorContentTag = u8"div.entry-content";
 constexpr char* const kSelectorImgTag = u8"img";
 
+constexpr int pageLimit = 10;
+
 }
 
 namespace crawler
@@ -79,7 +81,7 @@ SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 			urls.emplace_back(kIndexPath);
 		}
 
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < pageLimit; ++i)
 		{
 			std::string path(kIndexPath);
 			path.append(kPagePath);
@@ -103,8 +105,7 @@ SiteInfo HerbsutterBlogCrawler::GetPageSiteInfos()
 		if (partSiteInfos.size() < 10)
 		{
 			break;
-		}
-	
+		}	
 	}
 	
 	Notify(observer::kCompleteHerbsutterBlogReqeustAndGetPages);
@@ -157,6 +158,7 @@ bool HerbsutterBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 				if (imgTagSelection.nodeNum() != 0)
 				{
 					auto url = imgTagSelection.nodeAt(0).attribute(kSrcAttribute);
+					ModifyWrongUrl(url);
 					article.imagePath_ = DownloadImage(url);
 				}
 			}			
