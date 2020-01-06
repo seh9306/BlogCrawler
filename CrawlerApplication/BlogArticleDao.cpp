@@ -83,8 +83,6 @@ BlogArticleDao::~BlogArticleDao()
 
 bool BlogArticleDao::Initialize()
 {
-	sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
-
 	actions_[kSelectAllAritcle] 
 		= [this](int argc, char** argv, char** azColName, model::ArticleList* ptrArticles) -> int { 
 			return SelectAllAritcle(argc, argv, azColName, ptrArticles);
@@ -133,7 +131,14 @@ bool BlogArticleDao::InsertArticles(model::ArticleList& articles)
 
 		query.append(sqlite3_expanded_sql(pStmt));
 
-		sqlite3_finalize(pStmt);
+		if (pStmt != nullptr)
+		{
+			sqlite3_finalize(pStmt);
+		}
+		else
+		{
+			result = 1;
+		}
 	};
 	query.append(query::COMMIT);
 

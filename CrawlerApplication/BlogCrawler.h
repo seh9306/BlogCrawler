@@ -48,9 +48,9 @@ public:
 
 protected:
 	std::string DownloadImage(std::string& url);
-
 	std::unique_ptr<HtmlDocument> GetMainDocument();
 	time_t GetDate(std::string& url, const char* format);
+	time_t GetDateFromString(std::string& date, const char* format);
 	void ModifyWrongUrl(std::string& url);
 	std::string RequestAndGetImage(std::string& host, std::string& urlPath);
 	SiteInfo RequestAndGetDoc(UrlList& urls);

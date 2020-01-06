@@ -15,11 +15,14 @@ constexpr char* const kIndexPath = u8"/oldnewthing/";
 constexpr char* const kPagePath = u8"page/";
 
 // css selector
-constexpr char* const kSelectorForArchivesTag = u8"div.listdisplay li"; // "#wrapper-footer > div:nth-child(1) > div > div:nth-child(1) > div > div > div > li";
+constexpr char* const kSelectorForArchivesTag = u8"div.listdisplay li";
 constexpr char* const kSelectorForUrlTag = u8"a";
 constexpr char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
 constexpr char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
 constexpr char* const kSelectorForTitle = u8"#featured > div > h1";
+constexpr char* const kSelectorForDate = u8"#featured > div > div.entry-meta > p";
+
+constexpr char* const kDateFormat = "%Y-%m-%d %H:%M:%S";
 
 constexpr int workerNum = 6;
 
@@ -221,7 +224,12 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 		}
 
 		auto articleSelector = articleDoc->find(kArticleTagName);
+		if (articleSelector.nodeNum() == 0)
+		{
+			continue;
+		}
 
+		auto dateSelector = articleDoc->find(kSelectorForDate);
 		if (articleSelector.nodeNum() == 0)
 		{
 			continue;
@@ -237,11 +245,21 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 		{
 			continue;
 		}
+
 		auto articleNode = articleSelector.nodeAt(0);
+
+		if (dateSelector.nodeNum() == 0)
+		{
+			continue;
+		}
+
+		auto dateNode = dateSelector.nodeAt(0);
+
+		auto date = GetDateFromString(articleInfo.first, kDateFormat);
 
 		auto imgTagSelection = articleNode.find(kImgTagName);
 
-		std::string imagePath("");
+		std::string imagePath;
 		if (imgTagSelection.nodeNum() != 0)
 		{
 			auto url = imgTagSelection.nodeAt(0).attribute(kSrcAttribute);

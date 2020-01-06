@@ -75,33 +75,13 @@ std::string BlogCrawler::DownloadImage(std::string& urlPath)
 
 	return RequestAndGetImage(host, path);
 }
-/*
 
-Site BlogCrawler::RequestAndGetDoc(std::string& path)
-{
-	auto statusCode = httpClient->GetStatusCode();
-	if (statusCode != util::StatusCode::kResponseOK)
-	{
-		return { path, nullptr };
-	}
-
-	auto bufPerClient = httpClient->GetResponseBuf();
-	auto sizePerClient = httpClient->GetResponseSize();
-
-	std::string pagePerClient(bufPerClient, sizePerClient);
-		 
-	auto htmlDocument = std::make_unique<HtmlDocument>();;
-	htmlDocument->parse(pagePerClient);
-	
-	return { path, std::move(htmlDocument) };
-}
-*/
 std::string BlogCrawler::RequestAndGetImage(std::string& host, std::string& urlPath)
 {
 	boost::asio::io_context ioContextToGetArticles;
 	tcp::resolver resolver(ioContextToGetArticles);
 
-	//ModifyWrongUrl(host);
+	ModifyWrongUrl(host);
 	tcp::resolver::query query(host, util::kHttps);
 	auto endpoints = resolver.resolve(query);
 
@@ -270,28 +250,57 @@ std::time_t BlogCrawler::GetDate(std::string& url, const char* format)
 
 	struct std::tm tm;
 	std::istringstream ss(date.append(kAppendTime).c_str());
-	ss.imbue(std::locale());
-	ss >> std::get_time(&tm, format/*"%Y/%m/%d %H:%M:%S"*/);
+	ss.imbue(std::locale(kLocale));
+	ss >> std::get_time(&tm, format);
+
+	return mktime(&tm);
+}
+
+std::time_t BlogCrawler::GetDateFromString(std::string& date, const char* format)
+{
+	auto splitDate = date.substr(43, date.find('-') - 43);
+
+	auto year = splitDate.substr(0, 4);
+	auto month = splitDate.substr(4, 2);
+	auto day = splitDate.substr(6, 2);
+
+	auto target = year;
+	target.append("-");
+	target.append(month);
+	target.append("-");
+	target.append(day);
+
+	struct std::tm tm;
+	std::istringstream ss(target.append(kAppendTime).c_str());
+	ss.imbue(std::locale(kLocale));
+	ss >> std::get_time(&tm, format);
 
 	return mktime(&tm);
 }
 
 void BlogCrawler::ModifyWrongUrl(std::string& url)
 {
-	auto index = url.find(u8"\n");
+	auto index = url.find("\n");
 	if (index == std::string::npos)
 	{
 		return;
 	}
 
-	auto endIndex = url.find(u8"\n");
+	auto endIndex = url.find("\n", index + 1);
 
 	if (endIndex == std::string::npos)
 	{
+		url.erase(url.begin() + index);
 		return;
 	}
 
 	url.erase(url.begin() + index, url.begin() + endIndex);
+
+	index = url.find("\n");
+	if (index != std::string::npos)
+	{
+		ModifyWrongUrl(url);
+	}
 }
 
 }

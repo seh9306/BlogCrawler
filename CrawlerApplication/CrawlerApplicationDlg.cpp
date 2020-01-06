@@ -237,8 +237,6 @@ void CCrawlerApplicationDlg::OnClickedSearchButton()
 		std::string search = converter_.to_bytes(searchCstring.GetBuffer());
 		articles_ = blogArticleDao_->SelectArticles(search);
 
-		
-
 		imageList_.Detach();
 		imageList_.Create(300, 300, ILC_COLOR32, 0, 1000);
 
@@ -294,8 +292,15 @@ void CCrawlerApplicationDlg::SetArticleBlogDao(std::shared_ptr<dao::BlogArticleD
 void CCrawlerApplicationDlg::Update(observer::ProgressComplete progress)
 {
 	std::lock_guard<std::mutex> guard(progressMutex_);
-
-	progressCtrl_.SetPos(progressCtrl_.GetPos() + GetWorkScore(progress));
+	
+	auto score = GetWorkScore(progress);
+	
+	if (score == 100)
+	{
+		blogArticleDao_->Uninitialize();
+		MessageBox(_T("크롤링이 완료되었습니다."), _T("Crawler"), 0);
+	}
+	progressCtrl_.SetPos(progressCtrl_.GetPos() + score);
 }
 
 void CCrawlerApplicationDlg::OnGetdispinfoArticleList(NMHDR *pNMHDR, LRESULT *pResult)
