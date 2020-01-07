@@ -13,20 +13,20 @@
 namespace 
 {
 
-constexpr char* const kHost = u8"herbsutter.com";
-constexpr char* const kIndexPath = u8"/";
-constexpr char* const kPagePath = u8"page/";
+const char* const kHost = u8"herbsutter.com";
+const char* const kIndexPath = u8"/";
+const char* const kPagePath = u8"page/";
 
 // css selector
-constexpr char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
-constexpr char* const kSelectorForUrlTag = u8"a";
-constexpr char* const kSelectorTitleAndUrlTag = u8"header > h1 > a";
-constexpr char* const kSelectorContentTag = u8"div.entry-content";
-constexpr char* const kSelectorImgTag = u8"img";
+const char* const kSelectorForArchivesTag = u8"#archives-4 > ul > li";
+const char* const kSelectorForUrlTag = u8"a";
+const char* const kSelectorTitleAndUrlTag = u8"header > h1 > a";
+const char* const kSelectorContentTag = u8"div.entry-content";
+const char* const kSelectorImgTag = u8"img";
 
 constexpr int pageLimit = 10;
 
-constexpr char* const kDateFormat = "%Y/%m/%d %H:%M:%S";
+const char* const kDateFormat = "%Y/%m/%d %H:%M:%S";
 
 }
 

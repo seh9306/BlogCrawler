@@ -24,12 +24,12 @@ namespace blog
 {
 
 // tag name
-constexpr char* const kArticleTagName = u8"article";
-constexpr char* const kImgTagName = u8"img";
+const char* const kArticleTagName = u8"article";
+const char* const kImgTagName = u8"img";
 
 // tag attribute
-constexpr char* const kUrlAttribute = u8"href";
-constexpr char* const kSrcAttribute = u8"src";
+const char* const kUrlAttribute = u8"href";
+const char* const kSrcAttribute = u8"src";
 
 using UrlList = std::vector<std::string>;
 using HtmlDocument = Document;

@@ -10,19 +10,19 @@
 
 namespace {
 
-constexpr char* const kHost = u8"devblogs.microsoft.com";
-constexpr char* const kIndexPath = u8"/oldnewthing/";
-constexpr char* const kPagePath = u8"page/";
+const char* const kHost = u8"devblogs.microsoft.com";
+const char* const kIndexPath = u8"/oldnewthing/";
+const char* const kPagePath = u8"page/";
 
 // css selector
-constexpr char* const kSelectorForArchivesTag = u8"div.listdisplay li";
-constexpr char* const kSelectorForUrlTag = u8"a";
-constexpr char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
-constexpr char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
-constexpr char* const kSelectorForTitle = u8"#featured > div > h1";
-constexpr char* const kSelectorForDate = u8"#featured > div > div.entry-meta > p";
+const char* const kSelectorForArchivesTag = u8"div.listdisplay li";
+const char* const kSelectorForUrlTag = u8"a";
+const char* const kSelectorForLastPageTag = u8"li.page-item > a.page-link";
+const char* const kSelectorForArticleUrlTag = u8"#most-recent article header > h5 > a";
+const char* const kSelectorForTitle = u8"#featured > div > h1";
+const char* const kSelectorForDate = u8"#featured > div > div.entry-meta > p";
 
-constexpr char* const kDateFormat = "%Y-%m-%d %H:%M:%S";
+const char* const kDateFormat = "%Y-%m-%d %H:%M:%S";
 
 constexpr int workerNum = 6;
 

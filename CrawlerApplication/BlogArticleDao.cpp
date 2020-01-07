@@ -3,17 +3,12 @@
 
 #include "Query.h"
 
-using std::placeholders::_1;
-using std::placeholders::_2;
-using std::placeholders::_3;
-using std::placeholders::_4;
-
 namespace 
 {
 
-constexpr char* const kDbFilePath = u8"blog_article.db";
+const char* const kDbFilePath = u8"blog_article.db";
 
-constexpr char* const articleTableName = u8"ARTICLE";
+const char* const articleTableName = u8"ARTICLE";
 
 constexpr int kZeroEndString = -1;
 
