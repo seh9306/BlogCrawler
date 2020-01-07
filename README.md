@@ -1,6 +1,6 @@
 # Crawler
 
-The crawler is a Win 32 Application that searches `https://devblogs.microsoft.com/oldnewthing/` and `https://herbsutter.com/` using [boost asio](https://think-async.com/Asio/).
+The crawler is a Application that searches `https://devblogs.microsoft.com/oldnewthing/` and `https://herbsutter.com/` using [boost asio](https://think-async.com/Asio/).
 
 In addition, it has the following additional functions.
 * The request and parsing parts were implemented in `parallel`.
