@@ -267,7 +267,7 @@ bool DevMicrosoftBlogCrawler::GetAndInsertArticles(SiteInfo& pageSiteInfos)
 			imagePath = DownloadImage(url);
 		}
 
-		articles.emplace_back(titleNode.text(), articleInfo.first, imagePath, articleNode.text());
+		articles.emplace_back(titleNode.text(), articleInfo.first, imagePath, articleNode.text(), date);
 	}
 
 	Notify(observer::kCompleteDevMicrosoftBlogMappingArticles);
